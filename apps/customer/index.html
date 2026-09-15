@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Mi NexCourier — Demo</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/styles/demo-shell.css">
+</head>
+<body>
+  <header class="demo-nav">
+    <div class="demo-nav__inner">
+      <a class="brand" href="../website/" aria-label="NexCourier — Sitio público">
+        <img src="../../shared/assets/nexcourier-logo-transparent.png" alt="">
+        <span><strong>NexCourier</strong><small>Navegación local de demo</small></span>
+      </a>
+      <nav class="demo-links" aria-label="Experiencias de demostración">
+        <a href="../website/">Sitio público</a>
+        <a href="./" aria-current="page">Mi NexCourier</a>
+        <a href="../admin/">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main data-demo-root>
+    <section class="hero-shell">
+      <div class="shell">
+        <p class="demo-kicker"><span data-demo="demoLabel">Cargando datos…</span></p>
+        <h1>Mi NexCourier — Demo</h1>
+        <p class="hero-shell__copy">Shell inicial del portal privado. Verifica que la identidad del cliente y sus paquetes provienen del contrato compartido.</p>
+        <p class="demo-warning">Sin backend real · Los datos no se guardan ni se envían.</p>
+      </div>
+    </section>
+
+    <section class="content shell" aria-label="Prueba del contrato compartido">
+      <div class="proof-grid">
+        <article class="proof-card">
+          <h2>Cliente</h2>
+          <dl class="data-list">
+            <dt>Nombre</dt><dd data-demo="customerName">—</dd>
+            <dt>Código de cliente</dt><dd data-demo="customerId">—</dd>
+            <dt>Casillero</dt><dd data-demo="lockerCode">—</dd>
+            <dt>Recepción</dt><dd data-demo="lockerLocation">—</dd>
+          </dl>
+        </article>
+
+        <article class="proof-card">
+          <h2>Paquete reciente</h2>
+          <dl class="data-list">
+            <dt>Paquete</dt><dd data-demo="packageId">—</dd>
+            <dt>Tienda</dt><dd data-demo="packageMerchant">—</dd>
+            <dt>Estado</dt><dd><span class="status" data-demo="packageStatus">—</span></dd>
+            <dt>Ubicación</dt><dd data-demo="packageLocation">—</dd>
+          </dl>
+        </article>
+
+        <article class="proof-card proof-card--wide">
+          <h2>Requiere tu atención</h2>
+          <dl class="data-list">
+            <dt>Paquete</dt><dd data-demo="actionPackageId">—</dd>
+            <dt>Estado</dt><dd><span class="status status--attention" data-demo="actionPackageStatus">—</span></dd>
+            <dt>Mensaje</dt><dd data-demo="actionPackageMessage">—</dd>
+          </dl>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="demo-foot"><div class="shell">Mi NexCourier · Foundation shell · No es una interfaz final</div></footer>
+  <script src="../../shared/data/demo-data.js"></script>
+  <script src="../../shared/js/demo-shell.js"></script>
+</body>
+</html>
