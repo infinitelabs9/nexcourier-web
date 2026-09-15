@@ -76,8 +76,13 @@
   }
 
   function renderDashboard() {
-    const metricCards = data.metrics.map(function metricCard(metric) {
-      return '<button class="metric-card" type="button" data-route="' + esc(metric.page) + '" data-tone="' + esc(metric.tone) + '"><span class="metric-accent" aria-hidden="true"></span><span class="metric-label">' + esc(metric.label) + '</span><strong>' + esc(metric.value) + '</strong><span class="metric-trend" data-trend="' + esc(metric.trend || "neutral") + '">' + esc(metric.note) + '</span><span class="metric-link">Abrir cola ' + icon("chevron") + "</span></button>";
+    const metricVisuals = [
+      ["blue", "box"], ["critical", "alert"], ["warning", "file"], ["blue", "plane"],
+      ["slate", "arrival"], ["success", "check"], ["warning", "truck"],
+    ];
+    const metricCards = data.metrics.map(function metricCard(metric, index) {
+      const visual = metricVisuals[index] || ["slate", "box"];
+      return '<button class="metric-card" type="button" data-route="' + esc(metric.page) + '" data-accent="' + esc(visual[0]) + '"><span class="metric-accent" aria-hidden="true"></span><span class="metric-copy"><span class="metric-label">' + esc(metric.label) + '</span><strong>' + esc(metric.value) + '</strong></span><span class="metric-icon" aria-hidden="true">' + icon(visual[1]) + '</span><span class="metric-trend" data-trend="' + esc(metric.trend || "neutral") + '">' + esc(metric.note) + "</span></button>";
     }).join("");
     const priorities = data.priorities.map(function priority(item, index) {
       return '<button class="priority-row" type="button" data-route="' + esc(item.page) + '"' + (item.id ? ' data-id="' + esc(item.id) + '"' : "") + ' data-tone="' + esc(item.tone) + '"><span class="priority-index">' + (index + 1) + '</span><span class="priority-copy"><strong>' + esc(item.title) + "</strong><small>" + esc(item.detail) + '</small></span><span class="row-chevron">' + icon("chevron") + "</span></button>";
