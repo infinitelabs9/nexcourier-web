@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,follow" />
+<link rel="icon" href="data:,">
+<title>NexCourier — Compras y courier internacional en Paraguay</title>
+<meta name="description" content="Conocé cómo usar tu casillero NexCourier para recibir compras internacionales en Paraguay, rastrear paquetes y gestionar tu envío.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     NexCourier — international courier / logistics demo
+     Palette: corporate navy / blue / gold accent / neutral light
+     ============================================================ */
+  :root{
+    --navy:#071C3F;--navy-2:#04152E;--navy-3:#0A244B;
+    --blue:#1468E8;--blue-2:#2F80ED;--soft:#EAF2FF;
+    --gold:#C8A24C;--gold-2:#B4893A;
+    --text:#0D2345;--muted:#66758C;--bg:#F7F9FC;--white:#FFFFFF;--line:#DCE5F1;
+    --shadow-sm:0 4px 14px rgba(13,35,69,.06);
+    --shadow-md:0 14px 40px rgba(13,35,69,.10);
+    --shadow-lg:0 26px 70px rgba(7,28,63,.20);
+    --r:14px;--r-sm:10px;
+  }
+  *{box-sizing:border-box;}
+  html{margin:0;padding:0;scroll-behavior:smooth;overflow-x:clip;}
+  body{margin:0;padding:0;overflow-x:clip;background:var(--bg);color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  h1,h2,h3,h4{font-family:'Manrope','Inter',sans-serif;margin:0;line-height:1.12;letter-spacing:-.02em;font-weight:800;color:var(--text);}
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+  ul{margin:0;padding:0;list-style:none;}
+  button{font-family:inherit;cursor:pointer;}
+  [id]{scroll-margin-top:110px;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px;}}
+
+  .eyebrow{display:inline-flex;align-items:center;font-family:'Manrope',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);}
+  /* decorative leading dash removed across the demo */
+  .sec{padding:96px 0;}
+  .sec-head{max-width:680px;}
+  .sec-head h2{font-size:clamp(28px,3.6vw,44px);margin:16px 0 14px;}
+  .sec-head p{color:var(--muted);font-size:16.5px;}
+  .center{text-align:center;margin-left:auto;margin-right:auto;}
+  .center .eyebrow::before{display:none;}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;padding:14px 26px;border-radius:var(--r-sm);border:1px solid transparent;transition:transform .18s ease,background .18s ease,box-shadow .18s ease,color .18s,border-color .18s;white-space:nowrap;}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 10px 26px rgba(20,104,232,.32);}
+  .btn-primary:hover{background:var(--blue-2);transform:translateY(-2px);box-shadow:0 16px 34px rgba(20,104,232,.40);}
+  .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55);}
+  .btn-ghost:hover{background:rgba(255,255,255,.12);border-color:#fff;}
+  .btn-light{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm);}
+  .btn-light:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+  .btn-outline{background:#fff;color:var(--blue);border-color:var(--line);}
+  .btn-outline:hover{border-color:var(--blue);background:var(--soft);}
+
+  /* ============ header / nav (transparent over hero) ============ */
+  .site-head{position:fixed;left:0;right:0;top:0;z-index:90;color:#fff;background:transparent;
+    border-bottom:1px solid transparent;transition:background .3s ease,box-shadow .3s ease,border-color .3s ease,padding .3s ease;}
+  .site-head.scrolled{background:var(--navy-2);box-shadow:0 10px 30px rgba(4,21,46,.45);border-bottom-color:rgba(255,255,255,.08);}
+  .nav{display:flex;align-items:center;gap:28px;padding:20px 0;transition:padding .3s ease;}
+  .site-head.scrolled .nav{padding:12px 0;}
+  .brand{display:flex;align-items:center;gap:12px;flex:none;}
+  .brand-badge{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 16px rgba(20,104,232,.4);}
+  .brand-badge svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;}
+  .brand-txt b{display:block;font-family:'Manrope',sans-serif;font-weight:800;font-size:21px;letter-spacing:.02em;line-height:1;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.35);}
+  .brand-txt span{display:block;font-size:9.5px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:rgba(255,255,255,.72);margin-top:4px;}
+  .site-head.scrolled .brand-txt span{color:rgba(255,255,255,.62);}
+  .nav-links{display:flex;gap:22px;margin:0 auto;}
+  .nav-links a{position:relative;font-weight:600;font-size:14.5px;color:rgba(255,255,255,.85);padding:6px 0;transition:color .2s;text-shadow:0 1px 8px rgba(0,0,0,.3);}
+  .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:-2px;height:2px;background:var(--blue-2);transition:right .25s ease;}
+  .nav-links a:hover,.nav-links a.active{color:#fff;}
+  .nav-links a:hover::after,.nav-links a.active::after{right:0;}
+  .nav-right,.nav-utilities{display:flex;align-items:center;gap:13px;flex:none;}
+  .utility-link{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.84);white-space:nowrap;transition:color .2s;}
+  .utility-link:hover{color:#fff;}
+  .nav-loc{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);text-shadow:0 1px 8px rgba(0,0,0,.3);}
+  .nav-loc svg{width:16px;height:16px;stroke:var(--blue-2);fill:none;stroke-width:2;}
+  .nav-cta{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);padding:10px 18px;border-radius:var(--r-sm);font-family:'Manrope',sans-serif;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:7px;transition:background .2s,border-color .2s,transform .2s;}
+  .nav-cta svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+  .nav-cta:hover{background:#fff;color:var(--blue);border-color:#fff;transform:translateY(-1px);}
+  .site-head.scrolled .nav-cta{background:var(--blue);border-color:var(--blue);}
+  .site-head.scrolled .nav-cta:hover{background:var(--blue-2);border-color:var(--blue-2);color:#fff;}
+  .burger{display:none;width:46px;height:46px;border-radius:11px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:none;}
+  .burger span{width:20px;height:2px;background:#fff;border-radius:2px;transition:.25s;}
+  .site-head.scrolled .burger{background:rgba(255,255,255,.08);}
+  @media(max-width:1180px){.nav-links,.nav-loc,.nav-utilities{display:none;}.burger{display:flex;}.nav-links{margin:0;}.nav{justify-content:space-between;}}
+
+  /* mobile drawer */
+  .drawer{position:fixed;inset:0;z-index:200;visibility:hidden;}
+  .drawer-bg{position:absolute;inset:0;background:rgba(4,21,46,.6);opacity:0;transition:opacity .3s;}
+  .drawer-panel{position:absolute;top:0;right:0;height:100%;width:min(86vw,340px);background:var(--navy-2);color:#fff;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:26px;display:flex;flex-direction:column;overflow-y:auto;}
+  .drawer.open{visibility:visible;}
+  .drawer.open .drawer-bg{opacity:1;}
+  .drawer.open .drawer-panel{transform:translateX(0);}
+  .drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+  .drawer-top .drawer-brand{min-width:0;}
+  .drawer-top .drawer-brand .brand-badge,.drawer-top .drawer-brand .brand-txt{margin-top:0;}
+  .drawer-top b{font-family:'Manrope',sans-serif;font-weight:800;font-size:19px;}
+  .drawer-top span{display:block;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:3px;}
+  .drawer-x{background:none;border:none;color:#fff;font-size:30px;line-height:1;}
+  .drawer-panel nav a{display:block;font-family:'Manrope',sans-serif;font-weight:600;font-size:19px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.9);}
+  .drawer-panel nav a:hover{color:var(--blue-2);}
+  .drawer-panel .btn{margin-top:24px;width:100%;}
+  .drawer-info{margin-top:auto;padding-top:22px;font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.9;}
+
+  /* ============ hero ============ */
+  .hero{position:relative;min-height:860px;display:flex;flex-direction:column;align-items:stretch;overflow:hidden;
+    background:url('assets/hero-logistica-paraguay.png') center 30%/cover no-repeat;background-color:var(--navy-2);}
+  .hero::before{content:"";position:absolute;inset:0;background:
+    linear-gradient(90deg,rgba(4,21,46,.92) 0%,rgba(4,21,46,.74) 38%,rgba(4,21,46,.30) 68%,rgba(4,21,46,.52) 100%),
+    linear-gradient(180deg,rgba(4,21,46,.5) 0%,rgba(4,21,46,0) 22%,rgba(4,21,46,.16) 78%,rgba(4,21,46,.5) 100%);}
+  .hero > .wrap{display:flex;flex:1;width:100%;min-height:0;}
+  .hero-inner{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:150px 0 60px;}
+  .hero-copy{max-width:620px;color:#fff;}
+  .hero-copy .eyebrow{color:#8FBEFF;}
+  .hero-copy .eyebrow::before{background:#8FBEFF;}
+  .hero-copy h1{font-size:clamp(38px,5vw,64px);color:#fff;margin:20px 0 22px;letter-spacing:-.025em;line-height:1.04;}
+  .hero-copy h1 .bl{color:var(--blue-2);}
+  .hero-copy .lead{font-size:17.5px;color:rgba(255,255,255,.9);max-width:540px;margin-bottom:34px;line-height:1.7;}
+  .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+  .hero-trust{margin-top:30px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:rgba(255,255,255,.78);}
+  .hero-trust svg{width:18px;height:18px;stroke:var(--blue-2);fill:none;stroke-width:2;flex:none;}
+
+  /* operation status panel */
+  .op-panel{background:rgba(6,24,55,.82);backdrop-filter:blur(14px);border:1px solid rgba(143,190,255,.22);border-radius:18px;
+    padding:24px;color:#fff;box-shadow:var(--shadow-lg);max-width:440px;justify-self:end;width:100%;}
+  .op-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12);}
+  .op-head h3{font-size:17px;color:#fff;letter-spacing:-.01em;}
+  .op-head .op-id{font-size:12px;color:#8FBEFF;font-weight:600;margin-top:5px;font-family:'Manrope',sans-serif;}
+  .op-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#4ADE80;background:rgba(74,222,128,.12);padding:5px 10px;border-radius:20px;white-space:nowrap;}
+  .op-live i{width:7px;height:7px;border-radius:50%;background:#4ADE80;animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .op-route{display:flex;align-items:center;gap:12px;padding:16px 0;}
+  .op-route .pt{flex:1;}
+  .op-route .pt span{font-size:11px;color:var(--muted);color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+  .op-route .pt b{display:block;font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;margin-top:3px;}
+  .op-route .arw{color:var(--blue-2);flex:none;}
+  .op-route .arw svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .op-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);}
+  .op-meta div span{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+  .op-meta div b{display:block;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;margin-top:3px;}
+  .op-steps{padding:18px 0 6px;}
+  .op-steps .lbl{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:14px;}
+  .op-track{display:flex;align-items:center;}
+  .op-track .node{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex:none;font-size:12px;font-weight:700;transition:.3s;}
+  .op-track .node svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;}
+  .op-track .bar{flex:1;height:2px;background:rgba(255,255,255,.18);}
+  .op-track .done{background:var(--blue);border-color:var(--blue);}
+  .op-track .done+.bar,.op-track .bar.fill{background:var(--blue);}
+  .op-track .cur{background:var(--blue-2);border-color:var(--blue-2);box-shadow:0 0 0 5px rgba(47,128,237,.25);}
+  .op-labels{display:flex;justify-content:space-between;margin-top:9px;}
+  .op-labels span{font-size:9.5px;color:rgba(255,255,255,.6);text-align:center;flex:1;font-weight:600;letter-spacing:.02em;}
+  .op-labels span.on{color:#8FBEFF;}
+  .op-docbtn{margin-top:16px;width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:11px;border-radius:9px;font-weight:700;font-size:13px;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+  .op-docbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+  .op-docbtn:hover{background:rgba(255,255,255,.18);}
+  .op-mgr{display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);}
+  .op-mgr .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:#fff;flex:none;}
+  .op-mgr .info{flex:1;}
+  .op-mgr .info b{font-family:'Manrope',sans-serif;font-size:14px;display:block;}
+  .op-mgr .info span{font-size:11.5px;color:rgba(255,255,255,.6);}
+  .op-mgr .acts{display:flex;gap:8px;}
+  .op-mgr .acts a{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .op-mgr .acts a svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;}
+  .op-mgr .acts a:hover{background:var(--blue);border-color:var(--blue);}
+
+  /* ============ hero product showcase ============ */
+  .hero-product-showcase{
+    display:flex;align-items:center;justify-content:center;
+    justify-self:end;position:relative;width:100%;max-width:460px;
+    /* drop-shadow follows the transparent PNG shape — no rectangular box */
+    filter:drop-shadow(0 30px 60px rgba(4,21,46,.55)) drop-shadow(0 6px 18px rgba(20,104,232,.22));}
+  .hero-product-image{
+    display:block;width:100%;height:auto;object-fit:contain;
+    background:transparent;border:none;outline:none;}
+
+  /* ============ metrics marquee strip ============ */
+  /* contained glass panel at the hero's lower edge, scrolling right→left */
+  .metrics-strip{position:relative;z-index:5;flex:none;width:min(calc(100% - 64px),1040px);margin:0 auto 32px;overflow:hidden;
+    background:rgba(5,22,48,.72);border:1px solid rgba(110,160,255,.18);border-radius:18px;
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    box-shadow:0 18px 46px rgba(4,21,46,.26);}
+  .ms-mask{overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
+  .ms-track{display:flex;align-items:center;width:max-content;padding:16px 0;
+    animation:msScroll 44s linear infinite;will-change:transform;}
+  .metrics-strip:hover .ms-track,
+  .metrics-strip:focus-within .ms-track,
+  .metrics-strip.paused .ms-track{animation-play-state:paused;}
+  .ms-item{display:inline-flex;align-items:center;gap:13px;flex:0 0 auto;margin-right:46px;color:#fff;}
+  .ms-ico{width:44px;height:44px;border-radius:12px;background:rgba(143,190,255,.10);
+    border:1px solid rgba(143,190,255,.18);display:flex;align-items:center;justify-content:center;flex:none;}
+  .ms-ico svg{display:block;width:22px;height:22px;stroke:#8FBEFF;fill:none;stroke-width:2;}
+  .ms-item b{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:-.02em;display:block;line-height:1.1;}
+  .ms-item div span{font-size:12.5px;color:rgba(255,255,255,.64);display:block;margin-top:2px;letter-spacing:.01em;}
+  @keyframes msScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media(prefers-reduced-motion:reduce){
+    .ms-track{animation:none;padding:16px 0;}
+    .ms-mask{overflow-x:auto;-webkit-mask-image:none;mask-image:none;
+      scrollbar-width:none;-ms-overflow-style:none;}
+    .ms-mask::-webkit-scrollbar{display:none;}
+  }
+
+  /* ============ customer quick utilities ============ */
+  .quick-tools{padding:88px 0;background:var(--bg) url('section/conexiones_globales_en_tonos_suaves.png.png') center/cover no-repeat;}
+  .utility-shell{position:relative;overflow:hidden;border-radius:24px;padding:46px;background:linear-gradient(145deg,var(--navy) 0%,var(--navy-2) 100%);box-shadow:var(--shadow-lg);color:#fff;}
+  .utility-shell::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 86% 4%,rgba(47,128,237,.28),transparent 34%);pointer-events:none;}
+  .utility-head{position:relative;display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:30px;}
+  .utility-head .eyebrow{color:#8FBEFF;}
+  .utility-head h2{color:#fff;font-size:clamp(28px,3.4vw,42px);margin-top:14px;max-width:620px;}
+  .utility-head p{max-width:400px;color:rgba(255,255,255,.72);font-size:14.5px;}
+  .utility-grid{position:relative;display:grid;grid-template-columns:.86fr 1.14fr;gap:18px;}
+  .utility-card{background:rgba(255,255,255,.08);border:1px solid rgba(143,190,255,.2);border-radius:16px;padding:26px;backdrop-filter:blur(8px);}
+  .utility-card h3{color:#fff;font-size:19px;margin-bottom:7px;}
+  .utility-card>p{color:rgba(255,255,255,.67);font-size:13.5px;margin-bottom:19px;}
+  .utility-form{display:flex;gap:10px;align-items:end;}
+  .utility-field{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0;}
+  .utility-field label{font-family:'Manrope',sans-serif;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.78);}
+  .utility-field input,.utility-field select{width:100%;min-height:46px;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:#fff;color:var(--text);font:14px 'Inter',sans-serif;padding:11px 12px;}
+  .utility-field input:focus,.utility-field select:focus{outline:3px solid rgba(47,128,237,.35);border-color:#8FBEFF;}
+  .utility-card .btn{min-height:46px;padding:11px 18px;}
+  .calc-fields{display:grid;grid-template-columns:1.1fr .7fr .9fr;gap:10px;align-items:end;}
+  .utility-note{margin-top:12px;color:rgba(255,255,255,.58);font-size:11.5px;line-height:1.5;}
+  .utility-feedback{display:none;margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(143,190,255,.12);color:#DCEBFF;font-size:12.5px;}
+  .utility-feedback.show{display:block;}
+
+  /* ============ casillero + tariff teaser ============ */
+  .locker{background:#fff url('section/fondo_abstracto_suave_y_luminoso.png.png') center/cover no-repeat;}
+  .locker-grid{display:grid;grid-template-columns:1fr .9fr;gap:68px;align-items:center;}
+  .locker-copy h2{font-size:clamp(28px,3.5vw,44px);margin:16px 0 18px;}
+  .locker-copy>p{color:var(--muted);font-size:16px;margin-bottom:24px;max-width:620px;}
+  .locker-points{display:grid;gap:12px;margin:0 0 28px;}
+  .locker-points li{display:flex;gap:11px;align-items:flex-start;font-size:14.5px;color:var(--text);}
+  .locker-points svg{width:21px;height:21px;stroke:var(--gold-2);fill:none;stroke-width:2;flex:none;margin-top:1px;}
+  .address-card{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--navy-3),var(--navy-2));border-radius:20px;padding:34px;color:#fff;box-shadow:var(--shadow-lg);border:1px solid rgba(143,190,255,.18);}
+  .address-card::before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-90px;top:-100px;background:rgba(47,128,237,.2);}
+  .address-head{position:relative;display:flex;justify-content:space-between;gap:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.12);}
+  .address-head h3{color:#fff;font-size:20px;}
+  .demo-badge{font:700 10px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#E6C168;background:rgba(200,162,76,.12);border:1px solid rgba(230,193,104,.25);border-radius:20px;padding:5px 10px;height:max-content;}
+  .address-fields{position:relative;display:grid;gap:16px;padding-top:22px;}
+  .address-row{display:grid;grid-template-columns:118px 1fr;gap:12px;}
+  .address-row span{font-size:11px;color:rgba(255,255,255,.52);text-transform:uppercase;letter-spacing:.07em;font-weight:700;}
+  .address-row b{font:700 13.5px 'Manrope',sans-serif;color:#fff;}
+  .tariffs{padding:78px 0;background:var(--bg);}
+  .tariff-panel{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:38px 42px;box-shadow:var(--shadow-sm);}
+  .tariff-panel h2{font-size:clamp(25px,3vw,36px);margin:12px 0;}
+  .tariff-panel p{color:var(--muted);max-width:660px;font-size:15px;}
+  .tariff-points{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px;}
+  .tariff-points span{padding:8px 12px;border-radius:20px;background:var(--soft);color:var(--navy);font:700 12px 'Manrope',sans-serif;}
+
+  /* ============ restrictions + customer FAQ ============ */
+  .customer-help{background:#fff;}
+  .help-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:28px;margin-top:48px;align-items:start;}
+  .restriction-card{background:linear-gradient(155deg,var(--navy),var(--navy-2));color:#fff;border-radius:18px;padding:34px;box-shadow:var(--shadow-md);}
+  .restriction-card h3{color:#fff;font-size:23px;margin-bottom:13px;}
+  .restriction-card>p{color:rgba(255,255,255,.72);font-size:14.5px;margin-bottom:24px;}
+  .restriction-tags{display:grid;gap:10px;margin-bottom:26px;}
+  .restriction-tags li{padding:12px 14px;border:1px solid rgba(143,190,255,.18);border-radius:10px;background:rgba(255,255,255,.06);font:700 13px 'Manrope',sans-serif;}
+  .faq-list{border-top:1px solid var(--line);}
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-item summary{list-style:none;cursor:pointer;padding:18px 46px 18px 0;position:relative;font:700 15px 'Manrope',sans-serif;color:var(--text);}
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{content:"+";position:absolute;right:8px;top:13px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--blue);font-size:20px;}
+  .faq-item[open] summary{color:var(--blue);}
+  .faq-item[open] summary::after{content:"−";background:var(--blue);color:#fff;border-color:var(--blue);}
+  .faq-item p{color:var(--muted);font-size:14px;padding:0 46px 18px 0;}
+  .faq-more{margin-top:22px;}
+
+  /* ============ hero rotating emphasis word ============ */
+  .rot-wrap{display:inline-flex;align-items:baseline;position:relative;vertical-align:baseline;}
+  .rot-word{color:var(--blue-2);display:inline-block;white-space:nowrap;
+    transition:opacity .42s ease,transform .42s ease;will-change:opacity,transform;}
+  .rot-word.out{opacity:0;transform:translateY(-.28em);}
+  .rot-caret{width:3px;height:.92em;margin-left:5px;border-radius:2px;background:var(--blue-2);
+    align-self:center;opacity:.85;animation:caretBlink 1.1s steps(1,end) infinite;}
+  @keyframes caretBlink{0%,50%{opacity:.85;}51%,100%{opacity:0;}}
+  @media(prefers-reduced-motion:reduce){
+    .rot-word{transition:none;}.rot-word.out{opacity:1;transform:none;}
+    .rot-caret{animation:none;opacity:.55;}
+  }
+
+  /* ============ services cards — photo background ============ */
+  .svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:52px;}
+  .svc-card{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;min-height:360px;display:flex;flex-direction:column;justify-content:flex-end;background-size:cover;background-position:center;transition:transform .28s ease,box-shadow .28s ease;box-shadow:var(--shadow-sm);}
+  .svc-card::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(4,21,46,.92) 0%,rgba(4,21,46,.58) 52%,rgba(4,21,46,.20) 100%);transition:background .28s ease;}
+  .svc-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);}
+  .svc-card:hover::before{background:linear-gradient(to top,rgba(4,21,46,.96) 0%,rgba(4,21,46,.72) 55%,rgba(4,21,46,.32) 100%);}
+  .svc-card-body{position:relative;z-index:2;padding:26px 24px;}
+  .svc-card-accent{width:36px;height:2px;background:var(--blue-2);border-radius:2px;margin-bottom:14px;transition:width .28s ease;}
+  .svc-card:hover .svc-card-accent{width:56px;}
+  .svc-card h3{font-size:clamp(17px,1.5vw,20px);color:#fff;margin-bottom:10px;font-weight:800;line-height:1.2;text-shadow:0 1px 8px rgba(4,21,46,.5);}
+  .svc-card p{color:rgba(255,255,255,.82);font-size:14px;line-height:1.6;margin-bottom:18px;}
+  .svc-cta{display:inline-flex;align-items:center;gap:7px;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:#fff;background:rgba(20,104,232,.62);border:1px solid rgba(143,190,255,.42);border-radius:8px;padding:9px 16px;transition:background .2s,border-color .2s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .svc-cta svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s;}
+  .svc-card:hover .svc-cta{background:var(--blue);border-color:var(--blue);}
+  .svc-card:hover .svc-cta svg{transform:translateX(3px);}
+
+  /* ============ service modal ============ */
+  .svc-overlay{position:fixed;inset:0;z-index:300;background:rgba(4,21,46,.58);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .28s ease,visibility .28s ease;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .svc-overlay.open{opacity:1;visibility:visible;}
+  .svc-modal{position:relative;background:#fff;border-radius:20px;box-shadow:0 40px 90px rgba(4,21,46,.28);width:100%;max-width:900px;max-height:88vh;overflow-y:auto;transform:translateY(20px) scale(.97);transition:transform .32s cubic-bezier(.2,.9,.2,1);overscroll-behavior:contain;}
+  .svc-overlay.open .svc-modal{transform:none;}
+  .svc-modal-head{padding:36px 44px 22px;border-bottom:1px solid var(--line);position:relative;}
+  .svc-modal-tag{display:inline-block;font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);background:var(--soft);padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+  .svc-modal-head h2{font-size:clamp(22px,2.8vw,32px);color:var(--navy);margin:0;line-height:1.1;}
+  .svc-modal-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,border-color .2s;}
+  .svc-modal-close:hover{background:var(--soft);border-color:var(--blue);}
+  .svc-modal-close svg{width:18px;height:18px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;}
+  .svc-modal-body{padding:32px 44px 44px;}
+  .svc-modal-intro{font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:28px;}
+  .svc-modal-bullets{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:0;padding:0;list-style:none;}
+  .svc-modal-bullets li{display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--text);}
+  .svc-modal-bullets li svg{width:20px;height:20px;flex:none;stroke:#fff;fill:none;stroke-width:2.4;background:var(--blue);border-radius:50%;padding:3px;}
+  .svc-modal-faq{margin-top:36px;padding-top:28px;border-top:1px solid var(--line);}
+  .svc-modal-faq-lbl{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:var(--navy);margin:0 0 14px;}
+  .svc-faq-item{border-bottom:1px solid var(--line);}
+  .svc-faq-q{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 0;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;font-size:14.5px;color:var(--text);background:none;border:none;width:100%;text-align:left;line-height:1.45;transition:color .2s;}
+  .svc-faq-q:hover{color:var(--blue);}
+  .svc-faq-icon{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300;color:var(--muted);line-height:1;transition:background .2s,border-color .2s,color .2s,transform .25s;}
+  .svc-faq-item.open .svc-faq-icon{background:var(--blue);border-color:var(--blue);color:#fff;transform:rotate(45deg);}
+  .svc-faq-item.open .svc-faq-q{color:var(--blue);}
+  .svc-faq-a{overflow:hidden;max-height:0;transition:max-height .3s ease,padding-bottom .3s ease;font-size:14px;color:var(--muted);line-height:1.7;padding-bottom:0;}
+  .svc-faq-item.open .svc-faq-a{max-height:180px;padding-bottom:16px;}
+  .svc-modal-cta-row{margin-top:36px;padding-top:28px;border-top:1px solid var(--line);}
+  .svc-modal-cta-row .btn{min-width:200px;}
+  @media(prefers-reduced-motion:reduce){.svc-overlay,.svc-modal{transition:none;}.svc-faq-a{transition:none;}}
+  @media(max-width:640px){
+    .svc-modal-head{padding:24px 22px 18px;}
+    .svc-modal-body{padding:22px 22px 32px;}
+    .svc-modal-bullets{grid-template-columns:1fr;}
+    .svc-modal-close{top:14px;right:14px;}
+  }
+
+  /* ============ about ============ */
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+  .about-copy h2{font-size:clamp(28px,3.4vw,42px);margin:16px 0 20px;}
+  .about-copy p{color:var(--muted);font-size:16px;margin-bottom:18px;}
+  .about-list{margin:24px 0 8px;display:grid;gap:13px;}
+  .about-list li{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:500;color:var(--text);}
+  .about-list li svg{width:22px;height:22px;flex:none;stroke:var(--blue);fill:none;stroke-width:2;}
+  .about-metrics{display:flex;gap:40px;margin-top:30px;padding-top:26px;border-top:1px solid var(--line);}
+  .about-metrics b{font-family:'Manrope',sans-serif;font-weight:800;font-size:34px;color:var(--navy);display:block;line-height:1;}
+  .about-metrics span{font-size:13.5px;color:var(--muted);display:block;margin-top:6px;}
+  .about-visual{position:relative;}
+  .about-visual .ph{border-radius:18px;overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:4/4.4;}
+  .about-visual .ph img{width:100%;height:100%;object-fit:cover;}
+  .values-panel{position:absolute;right:-14px;bottom:-30px;width:min(300px,72%);background:var(--navy-2);color:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow-lg);border:1px solid rgba(143,190,255,.16);}
+  .values-panel h4{color:#fff;font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:9px;}
+  .values-panel h4 svg{width:18px;height:18px;stroke:var(--blue-2);fill:none;stroke-width:2;}
+  .values-panel .val{padding:11px 0;border-top:1px solid rgba(255,255,255,.1);}
+  .values-panel .val:first-of-type{border-top:none;}
+  .values-panel .val b{font-family:'Manrope',sans-serif;font-size:13.5px;color:#8FBEFF;display:block;}
+  .values-panel .val span{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;}
+
+  /* ============ process timeline ============ */
+  .process{background:var(--white);position:relative;overflow:hidden;}
+  /* .process::before circuit dot-grid removed — map texture via background.png is the only overlay */
+  .process .wrap{position:relative;z-index:1;}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px;position:relative;}
+  .steps::before{content:"";position:absolute;top:27px;left:11%;right:11%;height:2px;background:linear-gradient(90deg,var(--blue),var(--blue-2));opacity:.35;}
+  .step{position:relative;text-align:center;}
+  .step-num{width:56px;height:56px;border-radius:50%;background:#fff;border:2px solid var(--blue);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;position:relative;z-index:2;box-shadow:0 6px 18px rgba(20,104,232,.18);}
+  .step-ico{width:44px;height:44px;border-radius:11px;background:var(--soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+  .step-ico svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:1.9;}
+  .step h3{font-size:17px;margin-bottom:9px;}
+  .step p{color:var(--muted);font-size:14px;max-width:250px;margin:0 auto;}
+
+  /* ============ feature (dark import/export) ============ */
+  .feature{background:var(--navy-2);color:#fff;overflow:hidden;}
+  .feature-grid{display:grid;grid-template-columns:.92fr 1.08fr;align-items:center;gap:0;}
+  .feature-media{position:relative;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:1/1.05;}
+  .feature-media img{width:100%;height:100%;object-fit:cover;}
+  .feature-media::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 55%,rgba(4,21,46,.5));}
+  .feature-copy{padding:64px 0 64px 56px;}
+  .feature-copy .eyebrow{color:#8FBEFF;}
+  .feature-copy .eyebrow::before{background:#8FBEFF;}
+  .feature-copy h2{color:#fff;font-size:clamp(28px,3.4vw,42px);margin:16px 0 18px;}
+  .feature-copy>p{color:rgba(255,255,255,.82);font-size:16px;margin-bottom:26px;max-width:520px;}
+  .feature-list{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-bottom:32px;}
+  .feature-list li{display:flex;align-items:center;gap:11px;font-size:14.5px;color:rgba(255,255,255,.9);font-weight:500;}
+  .feature-list li svg{width:20px;height:20px;flex:none;stroke:var(--blue-2);fill:none;stroke-width:2;}
+
+  /* ============ testimonials ============ */
+  /* light editorial section — the dark styling now lives only on the review card */
+  .testi{background:var(--bg);color:var(--text);position:relative;overflow:visible;}
+  .testi .wrap{position:relative;z-index:1;}
+  .testi-head{max-width:640px;margin:0 0 44px;}
+  .testi-head .eyebrow{color:var(--blue);}
+  .testi-head h2{color:var(--text);font-size:clamp(28px,3.4vw,42px);margin-top:14px;}
+  /* overlapping 3-track grid: media | overlap zone | review. The smaller
+     media card (cols 1-2) sits in front and enters the larger review panel
+     (cols 2-3) which sits behind — no equal two-column gap */
+  .testi-layout{display:grid;grid-template-columns:32% 6% 62%;align-items:center;}
+  /* left photo block — smaller, clean image card, in front, spans into overlap zone */
+  .testi-photo{grid-area:1 / 1 / 2 / 3;z-index:2;position:relative;border-radius:20px;overflow:hidden;min-height:320px;box-shadow:var(--shadow-lg);border:1px solid var(--line);background:var(--soft);}
+  .testi-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+  /* right dark-blue review panel */
+  .testi-panel{grid-area:1 / 2 / 2 / 4;z-index:1;position:relative;background:linear-gradient(155deg,var(--navy-3) 0%,var(--navy-2) 100%);border:1px solid rgba(143,190,255,.16);border-radius:20px;padding:44px 46px 44px 82px;box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;justify-content:center;}
+  .testi-panel::before{content:"\201C";position:absolute;top:8px;left:26px;font-family:'Manrope',serif;font-size:150px;line-height:1;color:rgba(143,190,255,.14);pointer-events:none;}
+  .testi-stage{position:relative;min-height:210px;z-index:1;}
+  .tslide{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease,visibility .5s;}
+  .tslide.on{opacity:1;visibility:visible;transform:none;position:relative;}
+  .tslide .stars{color:#FBBF24;letter-spacing:.22em;font-size:16px;margin-bottom:18px;}
+  .tslide blockquote{font-family:'Manrope',sans-serif;font-weight:500;font-size:clamp(18px,1.9vw,24px);line-height:1.5;margin:0 0 24px;color:#fff;letter-spacing:-.01em;}
+  .tslide .who{display:flex;align-items:center;gap:14px;}
+  .tslide .who .av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:18px;flex:none;}
+  .tslide .who b{display:block;font-family:'Manrope',sans-serif;font-size:16px;}
+  .tslide .who span{display:block;font-size:13px;color:rgba(255,255,255,.65);}
+  .testi-dots{display:flex;gap:9px;margin-top:30px;position:relative;z-index:1;}
+  .testi-dots button{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.28);border:none;padding:0;transition:.25s;cursor:pointer;}
+  .testi-dots button.on{background:var(--blue-2);width:26px;border-radius:5px;}
+  .testi-cta{text-align:center;margin-top:44px;}
+
+  /* ============ trusted-by wordmark strip (text-only) ============ */
+  .trusted{padding:56px 0 60px;border-top:1px solid var(--line);}
+  .trusted-label{text-align:center;font-family:'Manrope',sans-serif;font-weight:700;font-size:12px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:34px;}
+  .trusted-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:24px 56px;max-width:960px;margin:0 auto;}
+  .wordmark{font-family:'Manrope',sans-serif;font-weight:800;font-size:22px;letter-spacing:.04em;
+    text-transform:uppercase;color:#8895AB;opacity:.72;line-height:1;white-space:nowrap;
+    transition:color .25s ease,opacity .25s ease;}
+  .wordmark:hover{color:var(--navy);opacity:1;}
+  /* subtle per-mark variation so the row reads as distinct brands, not a word list */
+  .wordmark.wm-thin{font-weight:600;letter-spacing:.14em;}
+  .wordmark.wm-italic{font-style:italic;letter-spacing:.02em;}
+  .wordmark.wm-wide{font-weight:700;letter-spacing:.22em;font-size:20px;}
+  @media(max-width:560px){
+    .trusted{padding:44px 0 46px;}
+    .trusted-row{gap:22px 40px;}
+    .wordmark{font-size:18px;}
+    .wordmark.wm-wide{font-size:16px;}
+  }
+
+  /* ============ documentation ============ */
+  .doc-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:28px;align-items:start;margin-top:52px;}
+  .doc-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:34px;box-shadow:var(--shadow-sm);}
+  .doc-panel h3{font-size:18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .doc-panel h3 svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:2;}
+  .doc-check{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .doc-check li{display:flex;align-items:center;gap:11px;font-size:14.5px;font-weight:500;padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;}
+  .doc-check li svg{width:20px;height:20px;flex:none;stroke:#fff;fill:none;stroke-width:2.4;background:var(--blue);border-radius:50%;padding:3px;}
+  .consult{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 100%);color:#fff;border-radius:16px;padding:34px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
+  .consult::before{content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(47,128,237,.3),transparent 70%);}
+  .consult-ico{width:52px;height:52px;border-radius:13px;background:rgba(47,128,237,.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;}
+  .consult-ico svg{width:26px;height:26px;stroke:#8FBEFF;fill:none;stroke-width:2;}
+  .consult h3{color:#fff;font-size:20px;margin-bottom:12px;position:relative;}
+  .consult p{color:rgba(255,255,255,.82);font-size:14.5px;margin-bottom:24px;position:relative;}
+  .consult .btn{position:relative;width:100%;}
+
+  /* ============ final CTA courier cutout ============ */
+  /* stage keeps overflow visible so the courier can rise above / sit outside
+     the blue panel; the panel and the courier are siblings, never nested */
+  .finalcta{background:var(--bg);padding:150px 0 0;overflow:visible;}
+  .finalcta .wrap{position:relative;overflow:visible;}
+  /* right gap leaves room for the courier to stand outside the panel edge */
+  .cta-panel{background:linear-gradient(150deg,var(--navy) 0%,var(--navy-2) 100%);border-radius:24px;padding:60px;color:#fff;position:relative;overflow:hidden;min-height:430px;z-index:1;margin-right:210px;}
+  .cta-panel::before{content:"";position:absolute;inset:0;opacity:.5;
+    background-image:radial-gradient(circle at 1px 1px,rgba(143,190,255,.14) 1px,transparent 0);background-size:30px 30px;}
+  .cta-copy{position:relative;z-index:2;max-width:560px;}
+  .cta-copy .eyebrow{color:#8FBEFF;}
+  .cta-copy .eyebrow::before{background:#8FBEFF;}
+  .cta-copy h2{color:#fff;font-size:clamp(30px,3.8vw,46px);margin:16px 0 18px;line-height:1.08;}
+  .cta-copy>p{color:rgba(255,255,255,.85);font-size:16px;margin-bottom:24px;max-width:490px;}
+  .cta-copy>.btn+.btn{margin-left:10px;}
+  .cta-bullets{display:grid;gap:12px;margin-bottom:32px;}
+  .cta-bullets li{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:500;color:rgba(255,255,255,.92);}
+  .cta-bullets li svg{width:21px;height:21px;flex:none;stroke:var(--blue-2);fill:none;stroke-width:2;}
+  /* transparent courier cutout — NO background box; sibling of panel, sits to
+     the right and overlaps the panel edge (~100px) rising above its top */
+  .cta-courier{position:absolute;right:0;bottom:0;z-index:2;width:320px;pointer-events:none;
+    filter:drop-shadow(0 26px 44px rgba(4,21,46,.5));}
+  .cta-courier img{display:block;width:100%;height:auto;object-fit:contain;background:transparent;border:0;box-shadow:none;}
+  @media(max-width:1200px){.cta-panel{margin-right:180px;}.cta-courier{width:290px;}}
+
+  /* ============ contact form ============ */
+  .contact{background:var(--white);}
+  .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start;}
+  .contact-info h2{font-size:clamp(28px,3.4vw,40px);margin:16px 0 16px;}
+  .contact-info p{color:var(--muted);font-size:16px;margin-bottom:28px;}
+  .contact-info .ci{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px;}
+  .contact-info .ci-ic{width:46px;height:46px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;}
+  .contact-info .ci-ic svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:2;}
+  .contact-info .ci b{font-family:'Manrope',sans-serif;font-size:14px;display:block;}
+  .contact-info .ci span{color:var(--muted);font-size:14px;}
+  .form-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:38px;box-shadow:var(--shadow-md);}
+  .form-card h3{font-size:22px;margin-bottom:6px;}
+  .form-card>p{color:var(--muted);font-size:14.5px;margin-bottom:24px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .field{display:flex;flex-direction:column;gap:7px;min-width:0;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:12.5px;font-weight:600;color:var(--text);font-family:'Manrope',sans-serif;}
+  .field input,.field textarea{font-family:'Inter',sans-serif;font-size:14.5px;color:var(--text);padding:12px 14px;border:1px solid var(--line);background:#fff;border-radius:10px;transition:border-color .2s,box-shadow .2s;}
+  .field textarea{min-height:96px;resize:vertical;}
+  .field input::placeholder,.field textarea::placeholder{color:#9AA7BA;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,104,232,.14);}
+  .form-card .btn{margin-top:22px;width:100%;}
+  .form-note{margin-top:14px;font-size:12.5px;color:var(--muted);text-align:center;}
+
+  /* custom dropdown */
+  .cselect{position:relative;}
+  .cselect-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--text);padding:12px 14px;border:1px solid var(--line);background:#fff;border-radius:10px;text-align:left;transition:border-color .2s,box-shadow .2s;}
+  .cselect-btn.placeholder{color:#9AA7BA;}
+  .cselect-btn svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;transition:transform .25s;flex:none;}
+  .cselect.open .cselect-btn{border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,104,232,.14);}
+  .cselect.open .cselect-btn svg{transform:rotate(180deg);}
+  .cselect-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-md);padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s,transform .18s,visibility .18s;max-height:260px;overflow-y:auto;}
+  .cselect.open .cselect-panel{opacity:1;visibility:visible;transform:none;}
+  .cselect-opt{padding:11px 13px;border-radius:8px;font-size:14px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s;}
+  .cselect-opt:hover,.cselect-opt.active{background:var(--soft);color:var(--blue);}
+  .cselect-opt.sel{font-weight:600;}
+  .cselect-opt svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2.4;opacity:0;}
+  .cselect-opt.sel svg{opacity:1;}
+  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+
+  /* ============ footer ============ */
+  .foot{background:var(--navy-2);color:rgba(255,255,255,.75);padding:70px 0 30px;}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1.2fr;gap:34px;padding-bottom:44px;border-bottom:1px solid rgba(255,255,255,.1);}
+  .foot-brand .fb{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .foot-brand .fb b{font-family:'Manrope',sans-serif;font-weight:800;font-size:19px;color:#fff;}
+  .foot-brand .fb span{display:block;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:3px;}
+  .foot-brand p{font-size:14px;line-height:1.7;margin-bottom:20px;max-width:290px;}
+  .foot-social{display:flex;gap:10px;}
+  .foot-social a{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .foot-social a svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;}
+  .foot-social a:hover{background:var(--blue);border-color:var(--blue);transform:translateY(-2px);}
+  .foot-col h4{color:#fff;font-size:14px;font-family:'Manrope',sans-serif;margin-bottom:16px;letter-spacing:.02em;}
+  .foot-col a{display:block;font-size:14px;padding:6px 0;color:rgba(255,255,255,.7);transition:color .2s;}
+  .foot-col a:hover{color:var(--blue-2);}
+  .foot-contact p{font-size:14px;line-height:1.9;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:24px;flex-wrap:wrap;}
+  .foot-bottom .lnk{display:flex;gap:22px;}
+  .foot-bottom .lnk a{font-size:13px;color:rgba(255,255,255,.6);}
+  .foot-bottom .lnk a:hover{color:#fff;}
+  .foot-bottom .cop{font-size:13px;color:rgba(255,255,255,.5);}
+
+  /* floating social launcher (WhatsApp + menu) */
+  .fab-social{position:fixed;right:26px;bottom:26px;z-index:120;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .fab-menu{display:flex;flex-direction:column;gap:10px;opacity:0;visibility:hidden;transform:translateY(10px) scale(.9);transform-origin:bottom center;transition:opacity .25s,transform .25s,visibility .25s;pointer-events:none;}
+  .fab-social.open .fab-menu{opacity:1;visibility:visible;transform:none;pointer-events:auto;}
+  .fab-item{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(4,21,46,.28);transition:transform .2s;}
+  .fab-item:hover{transform:translateY(-2px) scale(1.06);}
+  .fab-item svg{width:22px;height:22px;fill:#fff;}
+  .fab-item.wa{background:#25D366;}
+  .fab-item.ig{background:radial-gradient(circle at 30% 110%,#feda75,#fa7e1e 28%,#d62976 55%,#962fbf 78%,#4f5bd5);}
+  .fab-item.fb{background:#1877F2;}
+  .fab-main{width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(37,211,102,.45);cursor:pointer;transition:transform .2s,box-shadow .2s;}
+  .fab-main:hover{transform:scale(1.06);box-shadow:0 16px 34px rgba(37,211,102,.55);}
+  .fab-main svg{width:30px;height:30px;fill:#fff;}
+  .fab-main .ico-close{display:none;}
+  .fab-social.open .fab-main .ico-wa{display:none;}
+  .fab-social.open .fab-main .ico-close{display:block;}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(180%);z-index:250;background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);color:var(--text);padding:16px 22px;border-radius:12px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-lg);transition:transform .5s cubic-bezier(.2,.9,.2,1);max-width:92vw;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast .tic{width:38px;height:38px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;}
+  .toast .tic svg{width:20px;height:20px;stroke:var(--blue);fill:none;stroke-width:2.4;}
+  .toast b{font-family:'Manrope',sans-serif;font-size:14px;display:block;}
+  .toast span{font-size:13px;color:var(--muted);}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}*{scroll-behavior:auto!important;}}
+
+  /* ============ section backgrounds — per-section premium distribution ============ */
+  /* 3. Services: main global logistics map — worldwide reach */
+  #servicios{
+    background-color:var(--bg);
+    background-image:url('section/red_de_conexiones_globales_sutiles.png.png');
+    background-repeat:no-repeat;
+    background-position:center top;
+    background-size:cover;}
+  /* 4. About: soft luminous — clean, breathable, not map-heavy */
+  #nosotros{
+    background-image:url('section/fondo_abstracto_suave_y_luminoso.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 5. Process: subtle connection lines — logistical but distinct from services */
+  .process{
+    background-color:var(--white);
+    background-image:url('section/conexiones_globales_en_tonos_suaves.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 6. Solutions dark block: deep navy tech wave — layers over existing navy bg */
+  .feature{
+    background-image:url('section/fondo_abstracto_de_red_tecnol%C3%B3gica.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 7. Testimonials: soft luminous — calm and editorial */
+  .testi{
+    background-color:var(--bg);
+    background-image:url('section/fondo_abstracto_suave_y_luminoso.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 8. Trusted-by: soft luminous — elegant, low visual weight */
+  .trusted{
+    background-image:url('section/fondo_abstracto_suave_y_luminoso.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 9. Documentation: subtle connection lines — pairs with process rhythm */
+  #documentacion{
+    background-image:url('section/conexiones_globales_en_tonos_suaves.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+  /* 11. Contact: soft luminous — open and welcoming */
+  .contact{
+    background-image:url('section/fondo_abstracto_suave_y_luminoso.png.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;}
+
+  /* ============ responsive ============ */
+  @media(max-width:1080px){
+    .hero-inner{grid-template-columns:1fr;gap:40px;padding:140px 0 90px;}
+    .op-panel{justify-self:start;max-width:460px;}
+    .hero-product-showcase{justify-self:center;max-width:420px;}
+    .about-grid{gap:44px;}
+    .feature-grid{grid-template-columns:1fr;}
+    .feature-copy{padding:0 0 56px;}
+    .feature-media{order:-1;margin-top:0;}
+    .feature{padding-top:64px;}
+  }
+  @media(max-width:960px){
+    .sec{padding:76px 0;}
+    .metrics-strip{margin-top:0;}
+    .svc-grid{grid-template-columns:1fr 1fr;}
+    .about-grid{grid-template-columns:1fr;}
+    .about-visual{max-width:460px;}
+    .values-panel{right:0;}
+    .steps{grid-template-columns:1fr 1fr;gap:36px 24px;}
+    .steps::before{display:none;}
+    .feature-list{grid-template-columns:1fr;}
+    .testi-layout{grid-template-columns:1fr;gap:22px;}
+    .testi-photo{grid-area:auto;z-index:auto;min-height:240px;}
+    .testi-panel{grid-area:auto;z-index:auto;padding:36px 30px;}
+    .doc-grid{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;gap:40px;}
+    .finalcta{padding-top:80px;}
+    .cta-panel{padding:48px 40px 330px;margin-right:0;}
+    .cta-courier{width:280px;right:50%;transform:translateX(50%);}
+    .foot-grid{grid-template-columns:1fr 1fr;gap:30px;}
+    .foot-brand{grid-column:1/-1;}
+  }
+  @media(max-width:560px){
+    .metrics-strip{margin-top:0;}
+    .ms-item{margin-right:40px;gap:12px;}
+    .ms-item b{font-size:18px;}
+    .ms-ico{width:40px;height:40px;}
+    .svc-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr;}
+    .about-metrics{gap:26px;}
+    .form-grid{grid-template-columns:1fr;}
+    .doc-check{grid-template-columns:1fr;}
+    .op-meta{grid-template-columns:1fr;}
+    .cta-panel{padding:40px 26px 300px;}
+    .cta-courier{width:230px;}
+    .hero-btns .btn{flex:1;}
+    .hero-product-showcase{max-width:300px;}
+    .foot-grid{grid-template-columns:1fr;}
+    .foot-bottom{flex-direction:column;align-items:flex-start;}
+  }
+
+  /* ============ NexCourier brand lockup ============ */
+  /* Transparent source logo: no badge, crop, or synthetic white card. */
+  .brand-badge{width:58px;height:58px;border-radius:0;overflow:visible;background:transparent;padding:0;box-shadow:none;}
+  .brand-badge img{width:100%;height:100%;object-fit:contain;object-position:center;transform:none;}
+  .brand-txt b{letter-spacing:.01em;}
+  .eae-logo{display:block;height:auto;width:auto;max-height:54px;max-width:164px;object-fit:contain;background:transparent;border:0;box-shadow:none;flex-shrink:0;}
+  .eae-logo-drawer{max-height:40px;max-width:118px;}
+  .nex-logo-foot{display:block;width:158px;height:126px;object-fit:contain;object-position:left center;background:transparent;border:0;padding:0;margin:0 0 18px;box-shadow:none;}
+  @media(max-width:560px){.brand-badge{width:50px;height:50px}.brand-txt b{font-size:18px}.brand-txt span{font-size:8px}.nex-logo-foot{width:146px;height:116px;}}
+
+  /* ============ NexCourier gold brand accents (small highlights only) ============ */
+  /* On the dark hero a brighter champagne gold keeps contrast; elsewhere the
+     deeper gold token is used. Buttons remain on the existing blue system. */
+  .hero-copy h1 .bl,.rot-word{color:#E6C168;}
+  .rot-caret{background:#E6C168;}
+  .svc-card-accent{background:var(--gold);}
+  .svc-card:hover .svc-cta{background:var(--gold-2);border-color:var(--gold-2);}
+  .about-list li svg{stroke:var(--gold-2);}
+  .values-panel .val b{color:#E6C168;}
+
+  /* ── preview bar: NexCourier corporate navy/blue theme ── */
+  .inl-demo-bar{background:#071A34;border-bottom:1px solid rgba(120,160,255,.18);}
+  .inl-demo-bar .inl-dot{background:#4A90E2;box-shadow:0 0 0 4px rgba(74,144,226,.22);}
+  .inl-demo-bar .inl-label{color:rgba(255,255,255,.65);}
+  .inl-demo-bar .inl-label strong{color:#fff;}
+  .inl-demo-bar .preview-disclaimer{color:rgba(255,255,255,.42);}
+  .inl-demo-bar .preview-lang{border-color:rgba(120,160,255,.28);}
+  .inl-demo-bar .preview-lang button{color:rgba(255,255,255,.52);}
+  .inl-demo-bar .preview-lang button.is-active{background:#1F7BFF;color:#fff;}
+  .inl-demo-bar .preview-lang button:not(.is-active):hover{color:#fff;}
+  .inl-demo-bar .inl-back{color:rgba(255,255,255,.65);}
+  .inl-demo-bar .inl-back:hover{color:#fff;}
+  .inl-demo-bar .inl-cta{background:#1F7BFF;color:#fff;box-shadow:0 4px 12px rgba(31,123,255,.34);}
+  .inl-demo-bar .inl-cta:hover{background:#1468d8;}
+  .inl-demo-bar .inl-label{flex:1 1 auto;min-width:0;}
+  .inl-demo-bar .inl-label strong{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+  .inl-demo-bar .bar-actions{display:flex;align-items:center;gap:10px;flex:none;}
+  @media(max-width:640px){
+    .inl-demo-bar .inl-bar-inner{padding:8px;display:flex;flex-wrap:wrap;gap:7px 8px;justify-content:flex-start;}
+    .inl-demo-bar .inl-label{order:1;flex:1 1 auto;min-width:0;max-width:calc(100% - 112px);font-size:clamp(9px,2.55vw,11px);line-height:1.15;}
+    .inl-demo-bar .preview-lang{order:2;flex:0 0 auto;}
+    .inl-demo-bar .bar-actions{order:3;flex:1 0 100%;justify-content:center;gap:8px;min-width:0;}
+    .inl-demo-bar .inl-btn{font-size:clamp(10px,2.65vw,12px);padding:6px 11px;white-space:nowrap;flex:0 1 auto;}
+    .inl-demo-bar .inl-cta{padding-inline:clamp(12px,3vw,16px);}
+    .inl-demo-bar .preview-lang button{padding:3px 7px;font-size:10.5px;}
+  }
+  @media(min-width:641px) and (max-width:1180px){
+    .inl-demo-bar .inl-bar-inner{flex-wrap:nowrap;gap:clamp(8px,1vw,14px);}
+    .inl-demo-bar .inl-label{font-size:clamp(11px,1.25vw,13px);}
+    .inl-demo-bar .bar-actions{gap:clamp(8px,1vw,12px);}
+    .inl-demo-bar .inl-cta{padding-inline:clamp(10px,1.4vw,18px);white-space:nowrap;}
+  }
+  /* Language direction retained as a NexCourier control. */
+  .site-lang{display:inline-flex;align-items:center;padding:2px;border:1px solid rgba(255,255,255,.24);border-radius:8px;background:rgba(4,21,46,.3);}
+  .site-lang button{border:0;border-radius:6px;background:transparent;color:rgba(255,255,255,.62);padding:4px 7px;font:700 10px 'Manrope',sans-serif;line-height:1.2;}
+  .site-lang button:hover{color:#fff;}
+  .site-lang button.is-active{background:#fff;color:var(--navy);}
+  .site-lang--drawer{align-self:flex-start;margin:8px 0 18px;}
+
+  /* ============ focused phone refinements ============ */
+  @media(max-width:767px){
+    /* Compact hero — no viewport-fill since mockup is hidden */
+    .hero{min-height:auto;display:flex;flex-direction:column;align-items:stretch;}
+    .hero > .wrap{display:flex;flex:none;min-height:0;}
+    .hero-inner{display:flex;flex:none;flex-direction:column;justify-content:flex-start;gap:0;min-height:0;padding:clamp(86px, 18vw, 112px) 0 clamp(24px, 5vw, 40px);}
+    .hero-copy{width:100%;max-width:100%;min-width:0;}
+    .hero-copy .eyebrow{font-size:10.5px;letter-spacing:.1em;line-height:1.25;}
+    .hero-copy h1{font-size:clamp(2rem, 9.2vw, 2.7rem);line-height:1.02;margin:12px 0 18px;}
+    .hero-copy .rot-wrap{display:inline;}
+    .hero-copy .rot-word{display:inline;min-width:0!important;white-space:normal;text-align:left!important;}
+    .hero-copy .rot-caret{display:none;}
+    .hero-product-showcase{display:none;}
+
+    /* Compact left-aligned CTA button */
+    .hero-btns{display:flex;flex-wrap:wrap;gap:10px;width:auto;align-items:flex-start;justify-content:flex-start;}
+    .hero-btns .btn{flex:none;width:auto;min-width:0;min-height:auto;height:auto;padding:13px 20px;font-size:13px;line-height:1.4;white-space:nowrap;}
+    .hero-btns .btn svg{width:15px;height:15px;flex:none;}
+
+    /* Keep the shield and translated support sentence without decoration. */
+    .hero-trust{margin-top:14px;padding-left:0;gap:7px;align-items:flex-start;font-size:12px;line-height:1.38;}
+    .hero-trust::before,.hero-trust::after{content:none;display:none;}
+    .hero-trust svg{width:17px;height:17px;margin-top:1px;}
+
+    /* Full-width stats bar — no card treatment on phone */
+    .metrics-strip{position:relative;left:auto;bottom:auto;width:100%;max-width:none;margin:0;border-radius:0;border:none;border-top:1px solid rgba(80,145,255,.22);background:rgba(5,22,48,.90);box-shadow:none;flex:none;}
+    .ms-mask{-webkit-mask-image:none;mask-image:none;}
+    .ms-track{padding:12px 0;}
+    .ms-item{gap:9px;margin-right:30px;}
+    .ms-ico{width:38px;height:38px;border-radius:10px;}
+    .ms-ico svg{width:18px;height:18px;}
+    .ms-item b{font-size:17px;}
+    .ms-item div span{font-size:11px;line-height:1.3;}
+
+    /* Supplied vertical mobile world-map composition for Services. */
+    #servicios{background-color:var(--bg);background-image:url('section/section1.png');background-repeat:no-repeat;background-position:center top;background-size:cover;background-attachment:scroll;}
+
+    /* Short, per-step number-to-icon relationship line. */
+    .step::before{content:"";position:absolute;top:58px;left:50%;width:1px;height:8px;background:rgba(20,104,232,.42);transform:translateX(-50%);pointer-events:none;z-index:1;}
+    .step-num{margin-bottom:12px;}
+
+    .fab-social{right:14px;bottom:calc(64px + env(safe-area-inset-bottom));}
+    .quick-tools{padding:56px 0;}
+    .utility-shell{border-radius:0;margin-inline:-20px;padding:34px 20px;}
+    .utility-head{display:block;margin-bottom:24px;}
+    .utility-head p{margin-top:12px;}
+    .utility-grid,.locker-grid,.help-grid{grid-template-columns:1fr;gap:22px;}
+    .utility-form{display:grid;grid-template-columns:1fr;}
+    .calc-fields{grid-template-columns:1fr 1fr;}
+    .calc-fields .utility-field:first-child{grid-column:1/-1;}
+    .calc-fields .btn{grid-column:1/-1;}
+    .locker-grid{gap:38px;}
+    .address-card{padding:28px 22px;}
+    .address-row{grid-template-columns:1fr;gap:3px;}
+    .tariff-panel{grid-template-columns:1fr;padding:30px 24px;gap:24px;}
+    .tariff-panel .btn{width:100%;}
+    .help-grid{margin-top:34px;}
+    .cta-copy>.btn{width:100%;justify-content:center;}
+    .cta-copy>.btn+.btn{margin:10px 0 0;}
+  }
+
+  @media(prefers-reduced-motion:reduce) and (max-width:767px){
+    .hero-product-showcase{display:none;}
+  }
+
+  /* ============ DESKTOP hero + stats bar fix (≥ 1024px only) ============ */
+  @media (min-width: 1024px) {
+    /* Hero fills viewport; bottom:0 of hero is exactly where stats bar sits */
+    .hero {
+      min-height: calc(100vh - var(--preview-bar-height, 42px));
+      padding-bottom: 0;
+    }
+    /* Push hero copy up so it clears the absolutely-pinned stats bar (~80px tall) */
+    .hero-inner {
+      padding-bottom: clamp(110px, 14vh, 150px);
+    }
+    /* Stats bar: full-bleed, pinned to very bottom of hero, zero gap below */
+    .metrics-strip {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      border-radius: 0;
+      background: rgba(5, 22, 48, 0.90);
+      border: none;
+      border-top: 1px solid rgba(80, 145, 255, 0.28);
+      box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.22);
+    }
+  }
+
+  /* ============ tablet / iPad hero fixes (768–1180px) ============ */
+  @media(min-width:768px) and (max-width:1180px){
+    /* Hide product showcase mockup on tablet/iPad */
+    .hero-product-showcase{display:none !important;}
+
+    /* Compact hero — no viewport-fill, single column */
+    .hero{min-height:auto;padding-bottom:0;}
+    .hero-inner{grid-template-columns:1fr;padding:clamp(120px,16vw,150px) 0 clamp(28px,5vw,52px);}
+
+    /* Override desktop absolute positioning — full-width static stats bar */
+    .metrics-strip{position:relative;left:auto;bottom:auto;width:100%;max-width:none;margin:0;border-radius:0;border:none;border-top:1px solid rgba(80,145,255,.22);background:rgba(5,22,48,.90);box-shadow:none;}
+    .ms-mask{-webkit-mask-image:none;mask-image:none;}
+
+    /* Compact CTA button, left-aligned */
+    .hero-btns{justify-content:flex-start;align-items:flex-start;}
+    .hero-btns .btn{width:auto;max-width:max-content;padding:14px 22px;font-size:14px;}
+
+    /* Testimonial image: face is at ~8–28% from top of the portrait.
+       50% 15% centers the 240px viewport on that zone so the full face
+       (hat through chin) is visible without cutting forehead or chin. */
+    .testi-photo img{object-position:50% 15%;}
+  }
+
+  /* ============ tablet about centering — single-column range only ============ */
+  /* At 768–960px the about-grid is single-column and about-visual has max-width:460px
+     (from the 960px block) but no centering. This centers it without touching phone
+     or the 2-column range (961–1180px) where margin:auto would collapse the element. */
+  @media(min-width:768px) and (max-width:960px){
+    .about-visual{margin:0 auto;}
+    /* Values card: move lower so ~half hangs below the image edge.
+       about-visual has no overflow:hidden so no clipping. The existing
+       96px section bottom-padding accommodates the 90px extension safely. */
+    .values-panel{bottom:-90px;right:-80px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 2. Header / transparent nav ===== -->
+<header class="site-head" id="siteHead">
+  <div class="wrap">
+    <div class="nav">
+      <a class="brand" href="#inicio" data-scroll aria-label="NexCourier — Inicio">
+        <span class="brand-badge"><img src="assets/nexcourier-logo-transparent.png" alt="NexCourier"></span>
+        <span class="brand-txt"><b>NexCourier</b><span data-i18n="brand.tag">Logística Internacional</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#inicio" data-scroll class="active" data-i18n="nav.home">Inicio</a>
+        <a href="#servicios" data-scroll data-i18n="nav.services">Servicios</a>
+        <a href="#proceso" data-scroll data-i18n="nav.how">Cómo funciona</a>
+        <a href="#tarifas" data-scroll>Tarifas</a>
+        <a href="#ayuda" data-scroll>Ayuda</a>
+      </nav>
+      <div class="nav-utilities">
+        <div class="site-lang" aria-label="Idioma">
+          <button type="button" data-lang="es" class="is-active">ES</button>
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="zh">中文</button>
+        </div>
+        <a class="utility-link" href="./tracking/">Rastrear</a>
+        <a class="utility-link" href="./login/">Ingresar</a>
+        <a class="nav-cta" href="./registro/">Crear mi casillero <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-bg" data-close></div>
+  <div class="drawer-panel">
+    <div class="drawer-top">
+      <a class="brand drawer-brand" href="#inicio" data-scroll data-close aria-label="NexCourier — Inicio">
+        <span class="brand-badge"><img src="assets/nexcourier-logo-transparent.png" alt="NexCourier"></span>
+        <span class="brand-txt"><b>NexCourier</b><span data-i18n="brand.tag">Logística Internacional</span></span>
+      </a>
+      <button class="drawer-x" id="drawerX" data-close aria-label="Cerrar menú">&times;</button>
+    </div>
+    <nav aria-label="Navegación móvil">
+      <a href="#inicio" data-scroll data-close>Inicio</a>
+      <a href="#servicios" data-scroll data-close>Servicios</a>
+      <a href="#proceso" data-scroll data-close>Cómo funciona</a>
+      <a href="#tarifas" data-scroll data-close>Tarifas</a>
+      <a href="#ayuda" data-scroll data-close>Ayuda</a>
+      <a href="./tracking/" data-close>Rastrear</a>
+      <a href="./login/" data-close>Ingresar</a>
+    </nav>
+    <div class="site-lang site-lang--drawer" aria-label="Idioma">
+      <button type="button" data-lang="es" class="is-active">ES</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="zh">中文</button>
+    </div>
+    <a class="btn btn-primary" href="./registro/" data-close>Crear mi casillero</a>
+    <div class="drawer-info" data-i18n="drawer.info">
+      Compras y courier internacional para Paraguay.<br>
+      Las funciones privadas requieren integración.
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. Hero ===== -->
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow" data-i18n="hero.eyebrow">Courier Internacional · Paraguay</span>
+        <h1>Comprá en el exterior, recibí en Paraguay <span class="rot-wrap"><span class="rot-word bl" id="heroRot" data-words="de forma simple.|con información clara.|con acompañamiento.|a tu manera.">de forma simple.</span><span class="rot-caret" aria-hidden="true"></span></span></h1>
+
+        <div class="hero-btns">
+          <a class="btn btn-primary" href="./registro/">Crear mi casillero <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-ghost" href="#proceso" data-scroll data-i18n="hero.cta2">Conocer cómo funciona</a>
+        </div>
+        <a class="hero-trust" href="#soluciones" data-scroll><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>¿Tenés una carga comercial? Hablemos.</a>
+      </div>
+
+      <!-- product showcase -->
+      <div class="hero-product-showcase reveal">
+        <img class="hero-product-image"
+             src="assets/product.png"
+             alt="Vista de seguimiento de envíos NexCourier — ejemplo representativo del proceso"
+             loading="eager"
+             width="920" height="1060">
+      </div>
+    </div>
+  </div>
+<!-- ===== 4. Scrolling metrics strip ===== -->
+<div class="metrics-strip" id="metricsStrip" role="region" aria-label="Beneficios de NexCourier">
+  <div class="ms-mask">
+    <ul class="ms-track" id="msTrack">
+      <!-- primary set -->
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span>
+        <div><b>Compras internacionales</b><span>Tu recorrido de compra, explicado paso a paso</span></div>
+      </li>
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg></span>
+        <div><b>Tu casillero</b><span>Identificador y dirección asignados por NexCourier</span></div>
+      </li>
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <div><b>Seguimiento claro</b><span>Información durante cada etapa disponible</span></div>
+      </li>
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.48 12.89 17 22l-5-3-5 3 1.52-9.11"/></svg></span>
+        <div><b>Personas y empresas</b><span>Un camino para paquetes y otro para cargas</span></div>
+      </li>
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+        <div><b>Atención en Paraguay</b><span>Acompañamiento cuando necesitás ayuda</span></div>
+      </li>
+      <li class="ms-item">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></span>
+        <div><b>Logística coordinada</b><span>Procesos claros según el tipo de envío</span></div>
+      </li>
+      <!-- cloned set for seamless loop -->
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span>
+        <div><b>Compras internacionales</b><span>Tu recorrido de compra, explicado paso a paso</span></div>
+      </li>
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg></span>
+        <div><b>Tu casillero</b><span>Identificador y dirección asignados por NexCourier</span></div>
+      </li>
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <div><b>Seguimiento claro</b><span>Información durante cada etapa disponible</span></div>
+      </li>
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.48 12.89 17 22l-5-3-5 3 1.52-9.11"/></svg></span>
+        <div><b>Personas y empresas</b><span>Un camino para paquetes y otro para cargas</span></div>
+      </li>
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+        <div><b>Atención en Paraguay</b><span>Acompañamiento cuando necesitás ayuda</span></div>
+      </li>
+      <li class="ms-item" aria-hidden="true">
+        <span class="ms-ico"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></span>
+        <div><b>Logística coordinada</b><span>Procesos claros según el tipo de envío</span></div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</section>
+
+<!-- ===== 4b. Customer quick utilities ===== -->
+<section class="quick-tools" id="gestionar">
+  <div class="wrap">
+    <div class="utility-shell reveal">
+      <div class="utility-head">
+        <div><span class="eyebrow">Gestioná tu envío</span><h2>Todo lo que necesitás, en un solo lugar.</h2></div>
+        <p>Estas herramientas muestran el flujo previsto. Los resultados reales se habilitarán al conectar tracking y tarifas.</p>
+      </div>
+      <div class="utility-grid">
+        <form class="utility-card" id="trackingQuick" novalidate>
+          <h3>Rastrear paquete</h3>
+          <p>Ingresá el número de tracking de tu tienda o transportista.</p>
+          <div class="utility-form">
+            <div class="utility-field"><label for="quick-tracking">Número de tracking</label><input id="quick-tracking" name="tracking" type="text" autocomplete="off" placeholder="Ej.: tu número de tracking" required></div>
+            <button class="btn btn-primary" type="submit">Rastrear</button>
+          </div>
+          <div class="utility-feedback" id="trackingFeedback" role="status" aria-live="polite"></div>
+          <div class="utility-note">La consulta real estará disponible cuando se integre el sistema de tracking.</div>
+        </form>
+        <form class="utility-card" id="calculatorQuick" novalidate>
+          <h3>Calcular envío</h3>
+          <p>Prepará los datos que definirán una estimación, sin mostrar tarifas no confirmadas.</p>
+          <div class="calc-fields">
+            <div class="utility-field"><label for="calc-origin">Origen</label><select id="calc-origin" name="origen"><option value="">Seleccioná un origen</option><option value="assigned">Dirección asignada por NexCourier</option></select></div>
+            <div class="utility-field"><label for="calc-weight">Peso (kg)</label><input id="calc-weight" name="peso" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
+            <div class="utility-field"><label for="calc-size">Dimensiones</label><input id="calc-size" name="dimensiones" type="text" placeholder="L × A × H"></div>
+            <button class="btn btn-primary" type="submit">Calcular envío</button>
+          </div>
+          <div class="utility-feedback" id="calculatorFeedback" role="status" aria-live="polite"></div>
+          <div class="utility-note">Tarifas y reglas de peso facturable pendientes de confirmación comercial.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5. Core services ===== -->
+<section class="sec" id="servicios">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" data-i18n="sec.services.eyebrow">Nuestros Servicios</span>
+      <h2>Todo tu envío internacional, en un solo lugar</h2>
+      <p>Coordinamos cada etapa para que recibir tus compras y cargas del exterior sea un proceso simple, claro y seguro.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc-card reveal" data-svc="courier" role="button" tabindex="0" aria-haspopup="dialog" style="background-image:url('section/courier-casillero.png')">
+        <div class="svc-card-body">
+          <div class="svc-card-accent"></div>
+          <h3>Courier y Casillero</h3>
+          <p>Usá los datos asignados por NexCourier para identificar y recibir tus compras internacionales.</p>
+          <span class="svc-cta">Conocer más <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </article>
+      <article class="svc-card reveal" data-svc="compras" role="button" tabindex="0" aria-haspopup="dialog" style="background-image:url('section/compras-internacionales.png')">
+        <div class="svc-card-body">
+          <div class="svc-card-accent"></div>
+          <h3>Compras Internacionales</h3>
+          <p>Coordinamos la recepción de compras que realizás en tiendas y proveedores del exterior.</p>
+          <span class="svc-cta">Conocer más <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </article>
+      <article class="svc-card reveal" data-svc="carga" role="button" tabindex="0" aria-haspopup="dialog" style="background-image:url('section/servicio-despacho-aduanero-real.png.png')">
+        <div class="svc-card-body">
+          <div class="svc-card-accent"></div>
+          <h3>Carga para Empresas</h3>
+          <p>Coordinación internacional para operaciones comerciales, según el origen y tipo de carga.</p>
+          <span class="svc-cta">Conocer más <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </article>
+      <article class="svc-card reveal" data-svc="logistica" role="button" tabindex="0" aria-haspopup="dialog" style="background-image:url('section/entrega-paraguay.png')">
+        <div class="svc-card-body">
+          <div class="svc-card-accent"></div>
+          <h3>Entrega en Paraguay</h3>
+          <p>Opciones de retiro o entrega sujetas al servicio contratado y a la cobertura confirmada.</p>
+          <span class="svc-cta">Conocer más <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6. About ===== -->
+<section class="sec" id="nosotros" style="background-color:var(--white);">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-copy reveal">
+        <span class="eyebrow" data-i18n="sec.about.eyebrow">Sobre NexCourier</span>
+        <h2>Paraguay conectado con el mundo.</h2>
+        <p>NexCourier conecta a clientes en Paraguay con sus compras y paquetes del exterior mediante una experiencia de courier clara y acompañada.</p>
+        <p>Unimos identificación de paquetes, coordinación logística y soporte en cada etapa, con un camino separado para las necesidades comerciales.</p>
+        <ul class="about-list">
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Courier y logística internacional</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Soluciones para personas y empresas</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Coordinación de cargas internacionales</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Acompañamiento logístico y aduanero</li>
+        </ul>
+        <div class="about-metrics">
+          <div><b>Personas y empresas</b><span>Envíos personales y comerciales</span></div>
+          <div><b>Paraguay</b><span>Coordinación logística local</span></div>
+        </div>
+      </div>
+      <div class="about-visual reveal">
+        <div class="ph"><img src="assets/puerto-industrial-paraguay.png" alt="Operación logística de NexCourier — coordinación de carga y transporte hacia Paraguay" loading="lazy"></div>
+        <div class="values-panel">
+          <h4><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z"/></svg>Nuestros valores</h4>
+          <div class="val"><b>Rapidez</b><span>Coordinamos cada etapa buscando reducir esperas innecesarias.</span></div>
+          <div class="val"><b>Transparencia</b><span>Información clara sobre procesos, requisitos y costos.</span></div>
+          <div class="val"><b>Seguridad</b><span>Cuidamos cada envío durante su recorrido.</span></div>
+          <div class="val"><b>Acompañamiento</b><span>Te ayudamos a entender cada etapa de tu operación.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. Process timeline ===== -->
+<section class="sec process" id="proceso">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" data-i18n="sec.process.eyebrow">Cómo funciona</span>
+      <h2>Recibir del exterior, paso a paso</h2>
+      <p>Coordinamos cada etapa de tu envío para que el proceso sea simple, claro y con un único punto de contacto.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-ico"><svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg></div>
+        <h3>Creá tu casillero</h3>
+        <p>Registrate para recibir tu identificador y los datos de dirección asignados por NexCourier.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <div class="step-ico"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></div>
+        <h3>Comprá usando tus datos</h3>
+        <p>Usá tus datos NexCourier al comprar. Identificaremos el paquete cuando llegue a recepción.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <div class="step-ico"><svg viewBox="0 0 24 24"><path d="m16 16 2 2 4-4"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><path d="M3.29 7 12 12l8.71-5"/><path d="M12 22V12"/></svg></div>
+        <h3>Seguimos tu paquete</h3>
+        <p>NexCourier recibe y procesa el paquete antes de coordinar su viaje hacia Paraguay.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <div class="step-ico"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <h3>Retirá o recibí</h3>
+        <p>Cuando esté disponible en Paraguay, elegí una opción permitida de retiro o entrega.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7b. Public locker explainer ===== -->
+<section class="sec locker" id="casillero">
+  <div class="wrap">
+    <div class="locker-grid">
+      <div class="locker-copy reveal">
+        <span class="eyebrow">Tu casillero NexCourier</span>
+        <h2>Tu casillero para comprar en el exterior.</h2>
+        <p>Al crear tu cuenta recibirás un identificador y los datos que debés usar al comprar. Así NexCourier puede reconocer tu paquete y vincularlo con tu registro.</p>
+        <ul class="locker-points">
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Tu código acompaña el nombre del destinatario.</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Usás la dirección asignada por NexCourier al finalizar la compra.</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Tu paquete aparece cuando NexCourier confirma la recepción.</li>
+        </ul>
+        <a class="btn btn-primary" href="./casillero/">Conocer el casillero</a>
+      </div>
+      <div class="address-card reveal" aria-label="Ejemplo de datos de casillero">
+        <div class="address-head"><div><span class="eyebrow">Datos de recepción</span><h3>Tu dirección NexCourier</h3></div><span class="demo-badge">Ejemplo</span></div>
+        <div class="address-fields">
+          <div class="address-row"><span>Nombre</span><b>TU NOMBRE + TU CÓDIGO</b></div>
+          <div class="address-row"><span>Dirección</span><b>Dirección asignada por NexCourier</b></div>
+          <div class="address-row"><span>Ciudad / Estado</span><b>A confirmar</b></div>
+          <div class="address-row"><span>Identificador</span><b>Se genera al crear tu cuenta</b></div>
+        </div>
+        <p class="utility-note">Ejemplo visual. No representa una dirección operativa ni datos reales de un cliente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7c. Tariffs teaser ===== -->
+<section class="tariffs" id="tarifas">
+  <div class="wrap">
+    <div class="tariff-panel reveal">
+      <div>
+        <span class="eyebrow">Tarifas claras</span>
+        <h2>Entendé qué compone el costo de tu envío.</h2>
+        <p>La tarifa publicada deberá explicar el peso facturable, los extras que correspondan y la diferencia entre una estimación y el monto final.</p>
+        <div class="tariff-points"><span>Tarifa confirmada</span><span>Peso facturable</span><span>Extras aplicables</span><span>Entrega, si corresponde</span></div>
+      </div>
+      <a class="btn btn-primary" href="./tarifas/">Ver tarifas</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8. Import/Export feature ===== -->
+<section class="sec feature" id="soluciones">
+  <div class="wrap">
+    <div class="feature-grid">
+      <div class="feature-media reveal">
+        <img src="assets/carga-paquete-furgoneta.png" alt="Equipo de NexCourier cargando paquetes en una furgoneta para transporte y distribución" loading="lazy">
+      </div>
+      <div class="feature-copy reveal">
+        <span class="eyebrow" data-i18n="sec.feature.eyebrow">NexCourier Empresas</span>
+        <h2>Logística internacional para tu empresa.</h2>
+        <p>Además de envíos personales, NexCourier acompaña operaciones comerciales que requieren coordinación internacional, documentación y soluciones logísticas adaptadas a cada carga.</p>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Importaciones comerciales</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Carga aérea, marítima y terrestre</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Consolidación de carga</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Coordinación documental</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Gestión aduanera</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Coordinación con proveedores internacionales</li>
+        </ul>
+        <a class="btn btn-primary" href="#contacto" data-scroll>Solicitar cotización empresarial <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9. Testimonials ===== -->
+<section class="sec testi" id="novedades">
+  <div class="wrap">
+    <div class="testi-head reveal">
+      <span class="eyebrow" data-i18n="sec.testi.eyebrow">Por qué elegirnos</span>
+      <h2>¿Por qué elegir NexCourier?</h2>
+    </div>
+    <div class="testi-layout reveal">
+      <div class="testi-photo">
+        <img src="assets/puerto-industrial-paraguay.png" alt="Coordinación logística de NexCourier hacia Paraguay" loading="lazy">
+      </div>
+      <div class="testi-panel">
+        <div class="testi-stage" id="testiStage" aria-live="polite">
+          <div class="tslide on" role="group" aria-label="Razón 1 de 3">
+            <blockquote>Consultá la etapa disponible de tu paquete y encontrá la próxima acción en un solo lugar.</blockquote>
+            <div class="who"><span class="av">✓</span><div><b>Información clara</b><span>Cada etapa en contexto</span></div></div>
+          </div>
+          <div class="tslide" role="group" aria-label="Razón 2 de 3">
+            <blockquote>Cuando algo requiere tu atención, el sitio te indica qué dato o documento necesitás preparar.</blockquote>
+            <div class="who"><span class="av">✓</span><div><b>Acciones simples</b><span>Próximos pasos visibles</span></div></div>
+          </div>
+          <div class="tslide" role="group" aria-label="Razón 3 de 3">
+            <blockquote>Tu casillero, tus paquetes y la ayuda necesaria se conectan bajo una misma experiencia.</blockquote>
+            <div class="who"><span class="av">✓</span><div><b>Un solo lugar</b><span>Tu recorrido de courier conectado</span></div></div>
+          </div>
+        </div>
+        <div class="testi-dots" id="tDots" role="tablist" aria-label="Seleccionar razón"></div>
+      </div>
+    </div>
+    <div class="testi-cta reveal"><a class="btn btn-primary" href="./preguntas-frecuentes/">Ver preguntas frecuentes <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  </div>
+</section>
+
+<!-- ===== 9b. Trusted-by wordmark strip (text-only) ===== -->
+<section class="trusted" aria-label="Capacidades de NexCourier">
+  <div class="wrap">
+    <p class="trusted-label reveal">Lo que coordinamos por vos</p>
+    <div class="trusted-row reveal">
+      <span class="wordmark">Identificación</span>
+      <span class="wordmark wm-wide">Vinculación</span>
+      <span class="wordmark wm-italic">Recepción</span>
+      <span class="wordmark">Seguimiento</span>
+      <span class="wordmark wm-thin">Retiro</span>
+      <span class="wordmark">Soporte</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9c. Restrictions and FAQ ===== -->
+<section class="sec customer-help" id="ayuda">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Ayuda para tu compra</span>
+      <h2>Antes de comprar, revisá lo importante.</h2>
+      <p>Algunos productos pueden estar restringidos, requerir confirmación previa o necesitar un manejo especial según su tipo y la operación.</p>
+    </div>
+    <div class="help-grid">
+      <div class="restriction-card reveal">
+        <h3>Productos y condiciones</h3>
+        <p>Esta demo no publica una lista legal definitiva. Confirmá el producto antes de comprar.</p>
+        <ul class="restriction-tags"><li>Prohibidos</li><li>Requieren confirmación</li><li>Manejo especial</li></ul>
+        <a class="btn btn-light" href="./restricciones/">Ver productos restringidos</a>
+      </div>
+      <div class="reveal">
+        <div class="faq-list">
+          <details class="faq-item"><summary>¿Qué es un casillero?</summary><p>Es el conjunto de datos asignados a tu cuenta para identificar las compras que enviás a NexCourier.</p></details>
+          <details class="faq-item"><summary>¿Cómo uso mi código?</summary><p>Incluilo con tu nombre tal como aparezca en los datos de tu cuenta. La activación real depende del sistema de registro.</p></details>
+          <details class="faq-item"><summary>¿Cuándo aparece mi paquete?</summary><p>La visibilidad del paquete dependerá de la recepción y de la futura integración de tracking.</p></details>
+          <details class="faq-item"><summary>¿Qué es una prealerta?</summary><p>Es un aviso opcional con los datos de tu compra. Tu paquete también puede identificarse al llegar a recepción.</p></details>
+          <details class="faq-item"><summary>¿Cómo se calcula el costo?</summary><p>La regla de peso facturable y las tarifas están pendientes de confirmación comercial.</p></details>
+          <details class="faq-item"><summary>¿Qué hago si falta una factura?</summary><p>Prepará el comprobante de compra y contactá a soporte para conocer el requisito aplicable.</p></details>
+        </div>
+        <a class="btn btn-outline faq-more" href="./preguntas-frecuentes/">Ver preguntas frecuentes</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 10. Documentation assistance ===== -->
+<section class="sec" id="documentacion" style="background-color:var(--bg);">
+  <div class="wrap">
+    <div class="sec-head reveal">
+        <span class="eyebrow" data-i18n="docs.new.eyebrow">Documentación según tu envío</span>
+      <h2>Los requisitos dependen de lo que comprás.</h2>
+      <p>Un paquete personal no usa el mismo checklist que una carga comercial. El producto, el valor, la ruta y el tipo de operación pueden cambiar la documentación necesaria.</p>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-panel reveal">
+        <h3><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Para paquetes personales</h3>
+        <ul class="doc-check">
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Factura o comprobante</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Valor declarado</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Información del paquete</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Tracking de la compra</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Documento adicional, si aplica</li>
+        </ul>
+        <p class="form-note" style="text-align:left;margin-top:16px;">Las cargas comerciales pueden requerir documentación adicional dentro del flujo de NexCourier Empresas.</p>
+      </div>
+      <div class="consult reveal">
+        <div class="consult-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+        <h3>¿Tu producto requiere confirmación?</h3>
+        <p>Revisá restricciones y consultá a soporte antes de comprar cuando el producto necesite validación o manejo especial.</p>
+        <a class="btn btn-primary" href="./restricciones/">Revisar restricciones</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 11. Final CTA with courier cutout ===== -->
+<section class="finalcta" id="cotizacion">
+  <div class="wrap">
+    <div class="cta-panel reveal">
+      <div class="cta-copy">
+        <span class="eyebrow" data-i18n="final.new.eyebrow">Tu próxima compra</span>
+        <h2>Tu casillero NexCourier, listo para tu próxima compra.</h2>
+        <p>Conocé el recorrido, prepará tus datos y empezá el registro. La creación efectiva de cuentas se habilitará al integrar el portal.</p>
+        <ul class="cta-bullets">
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Tu identificador personal</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Datos de recepción asignados</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Identificación al recibir</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Información del proceso</li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Soporte cuando lo necesitás</li>
+        </ul>
+        <a class="btn btn-primary" href="./registro/">Crear mi casillero <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="#proceso" data-scroll>Conocer cómo funciona</a>
+      </div>
+    </div>
+    <div class="cta-courier"><img src="assets/courier-con-cajas-recortado.png" alt="Mensajero de NexCourier sosteniendo cajas de envío" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- ===== 12. Contact / support form ===== -->
+<section class="sec contact" id="contacto">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <span class="eyebrow" data-i18n="contact.new.eyebrow">Contacto / Soporte</span>
+        <h2>¿Necesitás ayuda con el proceso?</h2>
+        <p>Usá este espacio para una consulta general. El tracking, el registro y las cotizaciones empresariales tienen caminos separados.</p>
+        <div class="ci"><span class="ci-ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 1114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><div><b>Ubicación</b><span>Paraguay</span></div></div>
+        <div class="ci"><span class="ci-ic"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 11a16 16 0 006 6l1.6-1.2a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6a2 2 0 011.7 2z"/></svg></span><div><b>WhatsApp</b><span>Datos de contacto a confirmar</span></div></div>
+        <div class="ci"><span class="ci-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><path d="M22 6l-10 7L2 6"/></svg></span><div><b>Email</b><span>Datos de contacto a confirmar</span></div></div>
+        <div class="ci"><span class="ci-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><b>Atención</b><span>Canal y horarios pendientes de confirmación</span></div></div>
+      </div>
+
+      <form class="form-card reveal" id="quoteForm" novalidate>
+        <h3>Consulta general</h3>
+        <p>Este formulario es una interfaz de demostración y todavía no envía datos.</p>
+        <div class="form-grid">
+          <div class="field"><label for="q-name">Nombre completo</label><input id="q-name" name="nombre" type="text" placeholder="Tu nombre" required></div>
+          <div class="field"><label for="q-email">Email</label><input id="q-email" name="email" type="email" placeholder="tu@email.com" required></div>
+          <div class="field"><label for="q-phone">Teléfono / WhatsApp</label><input id="q-phone" name="telefono" type="tel" placeholder="+595 ..."></div>
+          <div class="field">
+            <label for="q-op">Motivo</label>
+            <select id="q-op" name="motivo" class="sr-only" data-cselect data-placeholder="Seleccioná una opción">
+              <option value="">Seleccioná una opción</option>
+              <option>Consulta sobre casillero</option>
+              <option>Ayuda con un paquete</option>
+              <option>Productos y restricciones</option>
+              <option>Consulta general</option>
+            </select>
+          </div>
+          <div class="field full"><label for="q-msg">Mensaje</label><textarea id="q-msg" name="mensaje" placeholder="Contanos en qué necesitás ayuda"></textarea></div>
+        </div>
+        <button class="btn btn-primary" type="submit">Revisar consulta <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="form-note">No se enviará información hasta conectar un canal oficial de soporte.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 13. Footer ===== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img class="nex-logo-foot" src="assets/nexcourier-logo-transparent.png" alt="NexCourier — Logística Internacional">
+        <p>NexCourier conecta tus compras internacionales con Paraguay mediante una experiencia de courier clara, con un camino adicional para empresas.</p>
+        <div class="foot-social">
+          <a href="#inicio" data-scroll aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M4 4h4v16H4zM6 4a2 2 0 100-.01M10 9h3.8v2.2h.05c.5-1 1.8-2.2 3.7-2.2 4 0 4.7 2.6 4.7 6V20H18v-4.9c0-1.2 0-2.7-1.7-2.7s-1.9 1.3-1.9 2.6V20H10z"/></svg></a>
+          <a href="#inicio" data-scroll aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a>
+          <a href="#inicio" data-scroll aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M15 3h-3a4 4 0 00-4 4v3H5v4h3v7h4v-7h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+          <a href="#contacto" data-scroll aria-label="Email"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>Servicios</h4>
+        <a href="./servicios/">Courier y Casillero</a>
+        <a href="./servicios/">Compras Internacionales</a>
+        <a href="./servicios/">Carga para Empresas</a>
+        <a href="./como-funciona/">Cómo funciona</a>
+      </div>
+      <div class="foot-col">
+        <h4>Empresas</h4>
+        <a href="#soluciones" data-scroll>Logística empresarial</a>
+        <a href="#documentacion" data-scroll>Documentación aplicable</a>
+        <a href="#soluciones" data-scroll>Carga comercial</a>
+        <a href="#contacto" data-scroll>Cotización empresarial</a>
+      </div>
+      <div class="foot-col">
+        <h4>Empresa</h4>
+        <a href="./nosotros/">Nosotros</a>
+        <a href="./tarifas/">Tarifas</a>
+        <a href="./preguntas-frecuentes/">Preguntas frecuentes</a>
+        <a href="./contacto/">Contacto</a>
+        <a href="#inicio" data-scroll>Inicio</a>
+      </div>
+      <div class="foot-col foot-contact">
+        <h4>Contacto</h4>
+        <p>Paraguay<br>Courier y logística internacional<br>Datos de contacto a confirmar<br>Canal de soporte a confirmar</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span class="cop">© 2026 NexCourier · Demo</span>
+      <div class="lnk">
+        <a href="./contacto/">Política pendiente</a>
+        <a href="./contacto/">Términos pendientes</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- floating social launcher; TODO: replace contact-only links when official social/WhatsApp URLs are confirmed -->
+<div class="fab-social" id="fabSocial">
+  <div class="fab-menu" id="fabMenu">
+    <a class="fab-item wa" href="#contacto" data-scroll data-contact-pending="whatsapp" aria-label="WhatsApp"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.2-157zM223.9 439.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.5-186.6 184.5zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg></a>
+    <a class="fab-item ig" href="#contacto" data-scroll data-contact-pending="instagram" aria-label="Instagram"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg></a>
+    <a class="fab-item fb" href="#contacto" data-scroll data-contact-pending="facebook" aria-label="Facebook"><svg viewBox="0 0 320 512" aria-hidden="true"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>
+  </div>
+  <button class="fab-main" id="fabToggle" type="button" aria-label="Abrir menú de contacto" aria-haspopup="true" aria-expanded="false" aria-controls="fabMenu">
+    <svg class="ico-wa" viewBox="0 0 448 512" aria-hidden="true"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.2-157zM223.9 439.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.5-186.6 184.5zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+    <svg class="ico-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<!-- ===== Service modal ===== -->
+<div class="svc-overlay" id="svcOverlay" role="dialog" aria-modal="true" aria-labelledby="svcModalTitle">
+  <div class="svc-modal" id="svcModal">
+    <div class="svc-modal-head">
+      <span class="svc-modal-tag" id="svcModalTag">Servicio</span>
+      <h2 id="svcModalTitle"></h2>
+      <button class="svc-modal-close" id="svcModalClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="svc-modal-body">
+      <p class="svc-modal-intro" id="svcModalIntro"></p>
+      <ul class="svc-modal-bullets" id="svcModalBullets"></ul>
+      <div class="svc-modal-faq">
+        <p class="svc-modal-faq-lbl">Preguntas frecuentes</p>
+        <div id="svcModalFaq"></div>
+      </div>
+      <div class="svc-modal-cta-row">
+        <button class="btn btn-primary" id="svcModalCta" type="button">Consultar este servicio <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="tic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
+  <div><b id="toastTitle">Envío no disponible en esta demo.</b><span id="toastMsg">Tus datos no fueron enviados.</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,c){return (c||document).querySelector(s);};
+  var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
+
+  /* ---- header offset + scrolled state ---- */
+  var bar=$('.inl-demo-bar'),head=$('#siteHead');
+  function barH(){return bar?bar.getBoundingClientRect().height:0;}
+  function setPreviewBarHeight(){if(bar){document.documentElement.style.setProperty('--preview-bar-height',barH()+'px');}}
+  function setTop(){if(head){head.style.top=barH()+'px';}}
+  function syncViewportChrome(){setPreviewBarHeight();setTop();}
+  syncViewportChrome();
+  window.addEventListener('resize',syncViewportChrome);
+  window.addEventListener('orientationchange',syncViewportChrome);
+  if(bar&&'ResizeObserver' in window){var previewBarObserver=new ResizeObserver(syncViewportChrome);previewBarObserver.observe(bar);}
+  function headOffset(){return barH()+(head?head.getBoundingClientRect().height:0);}
+  function onScroll(){if(head){head.classList.toggle('scrolled',window.pageYOffset>24);}}
+  window.addEventListener('scroll',onScroll,{passive:true});
+
+  /* ---- smooth anchor scroll ---- */
+  $$('a[data-scroll]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      var id=this.getAttribute('href');
+      if(id&&id.charAt(0)==='#'){
+        var t=$(id);
+        if(t){e.preventDefault();
+          var y=t.getBoundingClientRect().top+window.pageYOffset-headOffset()+2;
+          window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+        }
+      }
+    });
+  });
+
+  /* ---- mobile drawer ---- */
+  var drawer=$('#drawer');
+  function openDrawer(){drawer.classList.add('open');document.body.style.overflow='hidden';}
+  function closeDrawer(){drawer.classList.remove('open');document.body.style.overflow='';}
+  $('#burger').addEventListener('click',openDrawer);
+  $$('[data-close]',drawer).forEach(function(el){el.addEventListener('click',closeDrawer);});
+
+  /* ---- floating social launcher ---- */
+  var fab=$('#fabSocial'),fabToggle=$('#fabToggle');
+  if(fab&&fabToggle){
+    var closeFab=function(){fab.classList.remove('open');fabToggle.setAttribute('aria-expanded','false');};
+    fabToggle.addEventListener('click',function(e){
+      e.stopPropagation();
+      var open=fab.classList.toggle('open');
+      fabToggle.setAttribute('aria-expanded',open?'true':'false');
+    });
+    document.addEventListener('click',function(e){
+      if(fab.classList.contains('open')&&!fab.contains(e.target))closeFab();
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'&&fab.classList.contains('open')){closeFab();fabToggle.focus();}
+    });
+  }
+
+  /* ---- operation panel: docs button -> toast ---- */
+  var opDocs=$('#opDocs');
+  if(opDocs){opDocs.addEventListener('click',function(){showToast('Documentos de la operación','Vista previa disponible en la demo.');});}
+
+  /* ---- toast ---- */
+  var toast=$('#toast'),toastT=$('#toastTitle'),toastM=$('#toastMsg'),toastTimer;
+  function showToast(title,msg){
+    toastT.textContent=title;toastM.textContent=msg;
+    toast.classList.add('show');clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){toast.classList.remove('show');},4200);
+  }
+
+  /* ---- testimonials carousel ---- */
+  (function(){
+    var stage=$('#testiStage');if(!stage)return;
+    var slides=$$('.tslide',stage),dotsWrap=$('#tDots'),i=0,timer,n=slides.length;
+    slides.forEach(function(s,k){
+      var b=document.createElement('button');b.setAttribute('role','tab');
+      b.setAttribute('aria-label','Testimonio '+(k+1));
+      if(k===0)b.classList.add('on');
+      b.addEventListener('click',function(){go(k);restart();});
+      dotsWrap.appendChild(b);
+    });
+    var dots=$$('button',dotsWrap);
+    function go(k){
+      i=(k+n)%n;
+      slides.forEach(function(s,x){s.classList.toggle('on',x===i);});
+      dots.forEach(function(d,x){d.classList.toggle('on',x===i);});
+    }
+    function next(){go(i+1);}function prev(){go(i-1);}
+    function start(){if(!reduce&&!paused)timer=setInterval(next,6000);}
+    function stop(){clearInterval(timer);}
+    function restart(){stop();start();}
+    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    var paused=false;
+    /* pause on hover / focus / touch — no manual arrow controls */
+    var region=stage.closest('.testi-layout')||stage;
+    function pause(){paused=true;stop();}
+    function resume(){paused=false;restart();}
+    region.addEventListener('mouseenter',pause);
+    region.addEventListener('mouseleave',resume);
+    region.addEventListener('focusin',pause);
+    region.addEventListener('focusout',resume);
+    region.addEventListener('touchstart',pause,{passive:true});
+    region.addEventListener('touchend',function(){setTimeout(resume,4000);},{passive:true});
+    stage.setAttribute('tabindex','0');
+    stage.addEventListener('keydown',function(e){
+      if(e.key==='ArrowRight'){next();restart();}
+      else if(e.key==='ArrowLeft'){prev();restart();}
+    });
+    start();
+  })();
+
+  /* ---- hero rotating emphasis word ---- */
+  (function(){
+    var el=$('#heroRot');if(!el)return;
+    function getWords(){return (el.getAttribute('data-words')||'').split('|').map(function(w){return w.trim();}).filter(Boolean);}
+    var words=getWords();
+    if(words.length<2)return;
+    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    /* reserve width for the longest phrase so the caret and line never shift */
+    var longest=words.reduce(function(a,b){return b.length>a.length?b:a;},'');
+    el.style.minWidth=(longest.length+0.5)+'ch';
+    el.style.textAlign='left';
+    if(reduce)return;
+    var i=0;
+    setInterval(function(){
+      words=getWords();
+      if(words.length<2)return;
+      el.classList.add('out');
+      setTimeout(function(){
+        i=(i+1)%words.length;
+        el.textContent=words[i];
+        el.classList.remove('out');
+      },430);
+    },2800);
+  })();
+
+  /* ---- metrics marquee: pause on touch (hover/focus handled in CSS) ---- */
+  (function(){
+    var strip=$('#metricsStrip');if(!strip)return;
+    var t;
+    strip.addEventListener('touchstart',function(){clearTimeout(t);strip.classList.add('paused');},{passive:true});
+    strip.addEventListener('touchend',function(){t=setTimeout(function(){strip.classList.remove('paused');},2500);},{passive:true});
+  })();
+
+  /* ---- custom dropdowns ---- */
+  function buildSelect(sel){
+    var placeholder=sel.getAttribute('data-placeholder')||'Seleccioná';
+    var wrap=document.createElement('div');wrap.className='cselect';
+    var btn=document.createElement('button');btn.type='button';btn.className='cselect-btn placeholder';
+    btn.setAttribute('aria-haspopup','listbox');btn.setAttribute('aria-expanded','false');
+    btn.innerHTML='<span>'+placeholder+'</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+    var panel=document.createElement('div');panel.className='cselect-panel';panel.setAttribute('role','listbox');
+    var opts=Array.prototype.slice.call(sel.options).filter(function(o){return o.value!=='';});
+    var current=-1;
+    opts.forEach(function(o,idx){
+      var op=document.createElement('div');op.className='cselect-opt';op.setAttribute('role','option');op.tabIndex=-1;
+      op.innerHTML='<span>'+o.textContent+'</span><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+      op.addEventListener('click',function(){choose(idx);close();btn.focus();});
+      panel.appendChild(op);
+    });
+    var optEls=$$('.cselect-opt',panel);
+    function label(){return btn.querySelector('span');}
+    function choose(idx){
+      current=idx;
+      optEls.forEach(function(e,x){e.classList.toggle('sel',x===idx);});
+      label().textContent=opts[idx].textContent;
+      btn.classList.remove('placeholder');
+      sel.value=opts[idx].value||opts[idx].textContent;
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    function open(){
+      closeAll();wrap.classList.add('open');btn.setAttribute('aria-expanded','true');
+      active=current>=0?current:0;highlight();
+    }
+    function close(){wrap.classList.remove('open');btn.setAttribute('aria-expanded','false');}
+    var active=-1;
+    function highlight(){optEls.forEach(function(e,x){e.classList.toggle('active',x===active);});
+      if(optEls[active])optEls[active].scrollIntoView({block:'nearest'});}
+    btn.addEventListener('click',function(e){e.stopPropagation();wrap.classList.contains('open')?close():open();});
+    btn.addEventListener('keydown',function(e){
+      if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();if(!wrap.classList.contains('open'))open();else{active=Math.min(optEls.length-1,active+1);highlight();}}
+      else if(e.key==='ArrowUp'){e.preventDefault();if(wrap.classList.contains('open')){active=Math.max(0,active-1);highlight();}}
+      else if(e.key==='Escape'){close();}
+    });
+    panel.addEventListener('keydown',function(e){
+      if(e.key==='Escape'){close();btn.focus();}
+    });
+    wrap._close=close;
+    wrap.appendChild(btn);wrap.appendChild(panel);
+    sel.parentNode.insertBefore(wrap,sel.nextSibling);
+    return wrap;
+  }
+  var selects=[];
+  $$('select[data-cselect]').forEach(function(s){selects.push(buildSelect(s));});
+  function closeAll(){selects.forEach(function(w){if(w._close)w._close();});}
+  document.addEventListener('click',function(e){if(!e.target.closest('.cselect'))closeAll();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAll();closeDrawer();}});
+
+  /* ---- quick utility shells: validate input without inventing live results ---- */
+  function showInlineFeedback(id,message){
+    var box=$(id);if(!box)return;box.textContent=message;box.classList.add('show');
+  }
+  var trackingQuick=$('#trackingQuick');
+  if(trackingQuick){trackingQuick.addEventListener('submit',function(e){
+    e.preventDefault();
+    var value=$('#quick-tracking').value.trim();
+    showInlineFeedback('#trackingFeedback',value?'La consulta real requiere integrar el sistema de tracking. No se buscó ningún paquete.':'Ingresá un número de tracking para continuar.');
+  });}
+  var calculatorQuick=$('#calculatorQuick');
+  if(calculatorQuick){calculatorQuick.addEventListener('submit',function(e){
+    e.preventDefault();
+    var origin=$('#calc-origin').value,weight=$('#calc-weight').value;
+    showInlineFeedback('#calculatorFeedback',origin&&weight?'La tarifa y la regla de peso facturable siguen pendientes de configuración. No se calculó un precio.':'Completá el origen y el peso para preparar la estimación.');
+  });}
+
+  /* ---- support form demo state ---- */
+  var form=$('#quoteForm');
+  if(form){form.addEventListener('submit',function(e){
+    e.preventDefault();
+    showToast('Envío no disponible en esta demo.','Tus datos no fueron enviados. Falta conectar un canal oficial de soporte.');
+  });}
+
+  /* ---- scroll spy ---- */
+  var navLinks=$$('.nav-links a');
+  var sections=navLinks.map(function(a){return $(a.getAttribute('href'));});
+  function spy(){
+    var pos=window.pageYOffset+headOffset()+60,cur=0;
+    sections.forEach(function(s,idx){if(s&&s.offsetTop<=pos)cur=idx;});
+    navLinks.forEach(function(a,idx){a.classList.toggle('active',idx===cur);});
+  }
+  window.addEventListener('scroll',spy,{passive:true});
+
+  /* ---- reveal on scroll ---- */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+    },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+    $$('.reveal').forEach(function(el){io.observe(el);});
+  }else{$$('.reveal').forEach(function(el){el.classList.add('in');});}
+
+  /* ---- one-shot viewport count-up for the existing about metrics ---- */
+  (function(){
+    var metrics=$$('.about-metrics b');
+    if(!metrics.length)return;
+    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function spec(el){
+      var raw=el.textContent.trim(),m=raw.match(/^([^0-9]*)([0-9][0-9.,]*)(.*)$/);
+      if(!m)return null;
+      var digits=m[2].replace(/[^0-9]/g,'');
+      return {el:el,raw:raw,prefix:m[1],suffix:m[3],value:parseInt(digits,10)||0,separator:m[2].indexOf('.')>=0?'.':m[2].indexOf(',')>=0?',':''};
+    }
+    var items=metrics.map(spec).filter(Boolean);
+    function grouped(value,separator){
+      var text=String(Math.round(value));
+      if(!separator)return text;
+      return text.replace(/\B(?=(\d{3})+(?!\d))/g,separator);
+    }
+    function showFinal(){items.forEach(function(item){item.el.textContent=item.raw;});}
+    if(reduce||window.matchMedia('(min-width:1181px)').matches){showFinal();return;}
+    items.forEach(function(item){item.el.textContent=item.prefix+'0'+item.suffix;});
+    var started=false;
+    function animate(){
+      if(started)return;started=true;
+      var start=performance.now(),duration=1500;
+      function frame(now){
+        var progress=Math.min(1,(now-start)/duration), eased=1-Math.pow(1-progress,3);
+        items.forEach(function(item){item.el.textContent=item.prefix+grouped(item.value*eased,item.separator)+item.suffix;});
+        if(progress<1)requestAnimationFrame(frame);else showFinal();
+      }
+      requestAnimationFrame(frame);
+    }
+    if('IntersectionObserver' in window){
+      var observer=new IntersectionObserver(function(entries){
+        if(entries.some(function(entry){return entry.isIntersecting;})){observer.disconnect();animate();}
+      },{threshold:.25});
+      observer.observe(metrics[0].closest('.about-metrics')||metrics[0]);
+    }else animate();
+  }());
+
+  onScroll();spy();setTop();
+})();
+</script>
+<script>
+/* ---- service modal ---- */
+(function(){
+  'use strict';
+  var svcData={
+    courier:{
+      tag:'Courier y Casillero',title:'Courier y Casillero',
+      intro:'Usá los datos asignados por NexCourier para identificar y recibir tus compras internacionales.',
+      bullets:['Tu identificador personal','Datos de recepción asignados','Identificación al recibir','Información del proceso','Soporte cuando lo necesitás'],
+      faq:[
+        {q:'¿Qué es un casillero?',a:'Es el conjunto de datos asignados a tu cuenta para identificar las compras que enviás a NexCourier.'},
+        {q:'¿Cómo uso mi código?',a:'Incluilo con tu nombre tal como aparezca en los datos de tu cuenta. La activación real depende del sistema de registro.'},
+        {q:'¿Cuándo aparece mi paquete?',a:'La visibilidad del paquete dependerá de la recepción y de la futura integración de tracking.'},
+        {q:'¿Qué es una prealerta?',a:'Es un aviso opcional con los datos de tu compra. Tu paquete también puede identificarse al llegar a recepción.'}
+      ]
+    },
+    compras:{
+      tag:'Compras Internacionales',title:'Compras Internacionales',
+      intro:'Coordinamos la recepción de compras que realizás en tiendas y proveedores del exterior.',
+      bullets:['Usá tus datos NexCourier al comprar y registrá el tracking de tu paquete.','Factura o comprobante','Valor declarado','Información del paquete','Documento adicional, si aplica'],
+      faq:[
+        {q:'¿Qué es una prealerta?',a:'Es un aviso opcional con los datos de tu compra. Tu paquete también puede identificarse al llegar a recepción.'},
+        {q:'¿Cómo se calcula el costo?',a:'La regla de peso facturable y las tarifas están pendientes de confirmación comercial.'},
+        {q:'¿Qué hago si falta una factura?',a:'Prepará el comprobante de compra y contactá a soporte para conocer el requisito aplicable.'},
+        {q:'¿Cómo sé qué servicio necesito?',a:'Consultá a soporte antes de comprar cuando el producto necesite validación o manejo especial.'}
+      ]
+    },
+    carga:{
+      tag:'Carga para Empresas',title:'Carga para Empresas',
+      intro:'Coordinación internacional para operaciones comerciales, según el origen y tipo de carga.',
+      bullets:['Coordinación internacional','Documentación aplicable','Carga comercial','Cotización empresarial'],
+      faq:[
+        {q:'¿Pueden ayudarme con una importación comercial?',a:'La disponibilidad del servicio y su alcance requieren confirmación comercial.'},
+        {q:'¿Qué documentos puede necesitar una carga?',a:'Los requisitos dependen del producto, el valor, la ruta y el tipo de operación.'},
+        {q:'¿Trabajan con distintos tipos de carga?',a:'Cada modalidad debe confirmarse según el origen, el volumen y el tipo de carga.'},
+        {q:'¿Ofrecen consolidación de carga?',a:'La consolidación requiere confirmación comercial antes de presentarse como servicio activo.'}
+      ]
+    },
+    logistica:{
+      tag:'Entrega en Paraguay',title:'Entrega en Paraguay',
+      intro:'Opciones de retiro o entrega sujetas al servicio contratado y a la cobertura confirmada.',
+      bullets:['Coordinación logística','Información del proceso','Entrega, si corresponde','Soporte cuando lo necesitás'],
+      faq:[
+        {q:'¿Cómo funciona la entrega en Paraguay?',a:'La opción de retiro o entrega dependerá del servicio contratado y de la cobertura confirmada.'},
+        {q:'¿Puedo seguir el estado de mi envío?',a:'La información disponible dependerá de la futura integración de tracking.'},
+        {q:'¿Coordinan varias etapas del trayecto?',a:'La coordinación se definirá según el servicio confirmado para cada envío.'},
+        {q:'¿Atienden personas y empresas?',a:'La web mantiene caminos separados para paquetes personales y operaciones empresariales.'}
+      ]
+    }
+  };
+
+  var overlay=document.getElementById('svcOverlay');
+  var modal=document.getElementById('svcModal');
+  var closeBtn=document.getElementById('svcModalClose');
+  var modalTag=document.getElementById('svcModalTag');
+  var modalTitle=document.getElementById('svcModalTitle');
+  var modalIntro=document.getElementById('svcModalIntro');
+  var modalBullets=document.getElementById('svcModalBullets');
+  var modalFaq=document.getElementById('svcModalFaq');
+  var modalCta=document.getElementById('svcModalCta');
+  var prevFocus=null;
+  var checkIco='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+
+  function openModal(key){
+    var d=svcData[key];if(!d)return;
+    modalTag.textContent=d.tag;
+    modalTitle.textContent=d.title;
+    modalIntro.textContent=d.intro;
+    modalBullets.innerHTML=d.bullets.map(function(b){return '<li>'+checkIco+'<span>'+b+'</span></li>';}).join('');
+    modalFaq.innerHTML=d.faq.map(function(f,i){
+      return '<div class="svc-faq-item"><button class="svc-faq-q" type="button" aria-expanded="false" aria-controls="faq-a-'+i+'"><span>'+f.q+'</span><span class="svc-faq-icon">+</span></button><div class="svc-faq-a" id="faq-a-'+i+'" role="region">'+f.a+'</div></div>';
+    }).join('');
+    var items=modalFaq.querySelectorAll('.svc-faq-item');
+    items.forEach(function(item){
+      var btn=item.querySelector('.svc-faq-q');
+      btn.addEventListener('click',function(){
+        var wasOpen=item.classList.contains('open');
+        items.forEach(function(it){it.classList.remove('open');it.querySelector('.svc-faq-q').setAttribute('aria-expanded','false');});
+        if(!wasOpen){item.classList.add('open');btn.setAttribute('aria-expanded','true');}
+      });
+    });
+    modal.scrollTop=0;
+    prevFocus=document.activeElement;
+    overlay.classList.add('open');
+    document.body.style.overflow='hidden';
+    setTimeout(function(){closeBtn.focus();},60);
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    document.body.style.overflow='';
+    if(prevFocus){prevFocus.focus();prevFocus=null;}
+  }
+
+  closeBtn.addEventListener('click',closeModal);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('open'))closeModal();});
+
+  modalCta.addEventListener('click',function(){
+    closeModal();
+    setTimeout(function(){
+      var t=document.getElementById('contacto');
+      if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+    },320);
+  });
+
+  document.querySelectorAll('.svc-card[data-svc]').forEach(function(card){
+    card.addEventListener('click',function(){openModal(card.getAttribute('data-svc'));});
+    card.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(card.getAttribute('data-svc'));}
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  var LANG_KEY='nexcourier-public-lang';
+  var currentLang='es';
+  var T={en:{},es:{},zh:{}};
+  var rows=[
+    ['nav.home','Home','Inicio','首頁'],['nav.services','Services','Servicios','服務'],['nav.how','How it works','Cómo funciona','服務流程'],['nav.about','About','Nosotros','關於我們'],['nav.contact','Contact','Contacto','聯絡'],['nav.cta','Get a quote','Cotizar envío','取得報價'],
+    ['brand.tag','International Logistics','Logística Internacional','國際物流'],
+    ['drawer.info','International shopping and courier services for Paraguay.<br>Private features require integration.','Compras y courier internacional para Paraguay.<br>Las funciones privadas requieren integración.','巴拉圭國際購物與快遞服務。<br>私人功能需完成系統整合。'],
+    ['hero.eyebrow','International Courier · Paraguay','Courier Internacional · Paraguay','國際快遞 · 巴拉圭'],
+    ['hero.prefix','Shop worldwide, receive in Paraguay','Comprá en el mundo, recibí en Paraguay','全球購物，巴拉圭收件'],
+    ['hero.word1','without the hassle.','sin complicaciones.','輕鬆無憂。'],['hero.word2','with tracking.','con seguimiento.','全程追蹤。'],['hero.word3','with support.','con respaldo.','全程支援。'],['hero.word4','simply.','de forma simple.','簡單快捷。'],
+    ['cta.quoteMy','Get my quote','Cotizar mi envío','取得我的報價'],
+    ['hero.cta2','See how it works','Conocer cómo funciona','了解服務流程'],
+    ['hero.trust',"Got commercial cargo? Let's talk.",'¿Tenés una carga comercial? Hablemos.','有商業貨件嗎？與我們聊聊。'],
+    ['m.b1','International shipments','Envíos internacionales','國際貨件'],['m.s1','We connect your purchases and cargo with Paraguay','Conectamos tus compras y cargas con Paraguay','將您的購物與貨物送抵巴拉圭'],
+    ['m.b2','Clear tracking','Seguimiento claro','清楚追蹤'],['m.s2','Information at every stage of the process','Información durante cada etapa del proceso','在流程的每個階段提供資訊'],
+    ['m.b3','People and businesses','Personas y empresas','個人與企業'],['m.s3','From personal parcels to commercial cargo','Desde paquetes personales hasta cargas comerciales','從個人包裹到商業貨物'],
+    ['m.b4','Personal support','Atención personalizada','個人化服務'],['m.s4','We support you before, during, and after your shipment','Te acompañamos antes, durante y después del envío','出貨前、中、後全程陪伴'],
+    ['m.b5','Logistics coordination','Coordinación logística','物流協調'],['m.s5','Air, ocean, and ground based on your cargo','Aérea, marítima y terrestre según tu carga','依貨物選擇空運、海運與陸運'],
+    ['m.b6','Customs support','Apoyo aduanero','報關支援'],['m.s6','Document support when applicable','Acompañamiento documental cuando corresponde','必要時提供文件協助'],
+    ['sec.services.eyebrow','Our Services','Nuestros Servicios','我們的服務'],
+    ['services.title','Everything for your international shipment, in one place','Todo tu envío internacional, en un solo lugar','您的國際貨件，一站搞定'],
+    ['services.intro','We coordinate every stage so receiving your purchases and cargo from abroad is simple, clear, and secure.','Coordinamos cada etapa para que recibir tus compras y cargas del exterior sea un proceso simple, claro y seguro.','我們協調每個環節，讓您從海外收取購物與貨物更簡單、清楚且安全。'],
+    ['svc.courier','International Courier','Courier Internacional','國際快遞'],['svc.courier.p','We receive and coordinate your international parcels to bring them to Paraguay simply and securely.','Recibimos y coordinamos tus paquetes internacionales para llevarlos a Paraguay de forma simple y segura.','我們接收並協調您的國際包裹，簡單又安全地送抵巴拉圭。'],
+    ['svc.compras','International Shopping','Compras Internacionales','國際代購'],['svc.compras.p','We guide you through the process of receiving purchases made at overseas stores and suppliers.','Te acompañamos en el proceso para recibir compras realizadas en tiendas y proveedores del exterior.','我們陪您完成收取海外商店與供應商購物的流程。'],
+    ['svc.carga','International Cargo','Carga Internacional','國際貨運'],['svc.carga.p','Air, ocean, or ground solutions based on the origin, volume, and type of cargo.','Soluciones aéreas, marítimas o terrestres según el origen, volumen y tipo de carga.','依起運地、體積與貨物類型提供空運、海運或陸運方案。'],
+    ['svc.logistica','Logistics & Delivery','Logística y Entrega','物流與配送'],['svc.logistica.p','We coordinate moving your cargo to its final destination in Paraguay.','Coordinamos el movimiento de tu carga hasta su destino final en Paraguay.','我們協調將您的貨物運送至巴拉圭的最終目的地。'],
+    ['service.more','Learn more','Conocer más','瞭解更多'],
+    ['sec.about.eyebrow','About NexCourier','Sobre NexCourier','關於 NexCourier'],
+    ['about.title','Paraguay connected to the world.','Paraguay conectado con el mundo.','讓巴拉圭與世界相連。'],
+    ['about.p1','NexCourier is a Paraguayan international courier and logistics company that connects people and businesses with their purchases and cargo around the world.','NexCourier es una empresa paraguaya de courier y logística internacional que conecta personas y empresas con sus compras y cargas alrededor del mundo.','NexCourier 是一家巴拉圭的國際快遞與物流公司，為個人與企業串連全球的購物與貨物。'],
+    ['about.p2','We combine close support, logistics coordination, and guidance at every stage to make receiving products from abroad a simpler, clearer, and safer process.','Combinamos atención cercana, coordinación logística y acompañamiento durante cada etapa para hacer que recibir productos del exterior sea un proceso más simple, claro y seguro.','我們結合貼心服務、物流協調與全程陪伴，讓從海外收取商品更簡單、清楚且安全。'],
+    ['about.li1','International courier and logistics','Courier y logística internacional','國際快遞與物流'],['about.li2','Solutions for people and businesses','Soluciones para personas y empresas','為個人與企業提供解決方案'],['about.li3','Coordination of international cargo','Coordinación de cargas internacionales','國際貨物協調'],['about.li4','Logistics and customs support','Acompañamiento logístico y aduanero','物流與報關支援'],
+    ['about.m1','People and businesses','Personas y empresas','個人與企業'],['about.m1s','Personal and commercial shipments','Envíos personales y comerciales','個人與商業貨件'],['about.m2','Paraguay','Paraguay','巴拉圭'],['about.m2s','Local logistics coordination','Coordinación logística local','當地物流協調'],
+    ['values.title','Our values','Nuestros valores','我們的價值'],['values.speed','Speed','Rapidez','效率'],['values.speed.p','We coordinate each stage aiming to reduce unnecessary waiting.','Coordinamos cada etapa buscando reducir esperas innecesarias.','我們協調每個階段，力求減少不必要的等待。'],['values.trans','Transparency','Transparencia','透明'],['values.trans.p','Clear information about processes, requirements, and costs.','Información clara sobre procesos, requisitos y costos.','清楚說明流程、要求與費用。'],['values.security','Security','Seguridad','安全'],['values.security.p','We look after every shipment throughout its journey.','Cuidamos cada envío durante su recorrido.','在整個運送過程中妥善照護每件貨物。'],['values.support','Support','Acompañamiento','全程支援'],['values.support.p','We help you understand every stage of your operation.','Te ayudamos a entender cada etapa de tu operación.','我們協助您了解作業的每個階段。'],
+    ['sec.process.eyebrow','How it works','Cómo funciona','服務流程'],['process.title','Receiving from abroad, step by step','Recibir del exterior, paso a paso','海外收件，逐步完成'],['process.intro','We coordinate every stage of your shipment so the process is simple, clear, and with a single point of contact.','Coordinamos cada etapa de tu envío para que el proceso sea simple, claro y con un único punto de contacto.','我們協調您貨件的每個階段，讓流程簡單清楚，並有單一聯絡窗口。'],
+    ['process.1','Tell us what you want to bring','Contanos qué querés traer','告訴我們您想帶什麼'],['process.1.p','Share the origin, the type of product, and the basic details of your shipment.','Compartinos el origen, el tipo de producto y los datos básicos de tu envío.','提供起運地、產品類型與貨件的基本資訊。'],['process.2','We coordinate the reception','Coordinamos la recepción','我們安排收件'],['process.2.p','We tell you the steps needed to prepare and receive your parcel or cargo.','Te indicamos los pasos necesarios para preparar y recibir tu paquete o carga.','我們告知您準備並接收包裹或貨物所需的步驟。'],['process.3','We move it to Paraguay','Lo trasladamos a Paraguay','我們運往巴拉圭'],['process.3.p','We coordinate transport, tracking, and the corresponding logistics processes.','Coordinamos transporte, seguimiento y los procesos logísticos correspondientes.','我們協調運輸、追蹤與相應的物流流程。'],['process.4','Receive your shipment','Recibí tu envío','收取您的貨件'],['process.4.p','Once available in Paraguay, we coordinate delivery or pickup based on the contracted service.','Una vez disponible en Paraguay, coordinamos la entrega o el retiro según el servicio contratado.','貨件抵達巴拉圭後，我們依所選服務安排配送或自取。'],
+    ['sec.feature.eyebrow','NexCourier for Business','NexCourier Empresas','NexCourier 企業'],['feature.title','International logistics for your company.','Logística internacional para tu empresa.','為您的企業提供國際物流。'],['feature.p','Beyond personal shipments, NexCourier supports commercial operations that require international coordination, documentation, and logistics solutions tailored to each cargo.','Además de envíos personales, NexCourier acompaña operaciones comerciales que requieren coordinación internacional, documentación y soluciones logísticas adaptadas a cada carga.','除了個人貨件，NexCourier 也支援需要國際協調、文件處理與客製物流方案的商業作業。'],
+    ['feature.1','Commercial imports','Importaciones comerciales','商業進口'],['feature.2','Air, ocean, and ground cargo','Carga aérea, marítima y terrestre','空運、海運與陸運貨物'],['feature.3','Cargo consolidation','Consolidación de carga','貨物併櫃'],['feature.4','Document coordination','Coordinación documental','文件協調'],['feature.5','Customs management','Gestión aduanera','海關管理'],['feature.6','Coordination with international suppliers','Coordinación con proveedores internacionales','國際供應商協調'],['feature.cta','Request a business quote','Solicitar cotización empresarial','申請企業報價'],
+    ['sec.testi.eyebrow','Why choose us','Por qué elegirnos','為何選擇我們'],['testi.title','Why choose NexCourier?','¿Por qué elegir NexCourier?','為何選擇 NexCourier？'],
+    ['testi.q1','We explain the process and requirements before coordinating your shipment, so you know what to expect at each stage.','Te explicamos el proceso y los requisitos antes de coordinar tu envío, para que sepas qué esperar en cada etapa.','在安排貨件前，我們會說明流程與要求，讓您清楚每個階段的預期。'],['testi.t1','Clarity from the start','Claridad desde el inicio','從一開始就清楚'],['testi.s1','Process and requirements explained','Proceso y requisitos explicados','清楚說明流程與要求'],
+    ['testi.q2','A team available to help you through the various stages of your operation, with a single point of contact.','Un equipo disponible para ayudarte durante las distintas etapas de tu operación, con un único punto de contacto.','專業團隊在作業各階段提供協助，並有單一聯絡窗口。'],['testi.t2','Close support','Atención cercana','貼心服務'],['testi.s2','Guidance at every stage','Acompañamiento en cada etapa','每個階段的陪伴'],
+    ['testi.q3','We serve the needs of individuals and also business operations, adapting the solution to each shipment.','Atendemos necesidades de personas y también operaciones empresariales, adaptando la solución a cada envío.','我們同時服務個人與企業需求，依每件貨件調整方案。'],['testi.t3','Flexible solutions','Soluciones flexibles','彈性方案'],['testi.s3','For people and businesses','Para personas y empresas','適用個人與企業'],
+    ['trusted.label','What we coordinate for you','Lo que coordinamos por vos','我們為您協調的項目'],
+    ['cap.compras','International shopping','Compras internacionales','國際代購'],['cap.courier','Courier','Courier','快遞'],['cap.air','Air cargo','Carga aérea','空運貨物'],['cap.sea','Ocean cargo','Carga marítima','海運貨物'],['cap.log','Logistics','Logística','物流'],['cap.customs','Customs','Aduanas','報關'],
+    ['sec.docs.eyebrow','Documentation & Customs','Documentación y Aduanas','文件與報關'],['docs.title','Your cargo, with the process in order','Tu carga, con el proceso en orden','您的貨物，流程井然有序'],['docs.p','For operations that require document or customs handling, we support you in reviewing and coordinating the corresponding requirements.','Para operaciones que requieren gestión documental o aduanera, te acompañamos en la revisión y coordinación de los requisitos correspondientes.','對於需要文件或報關處理的作業，我們會協助您審核並協調相應的要求。'],['docs.check','Document checklist','Checklist documental','文件清單'],['docs.invoice','Commercial invoice','Factura comercial','商業發票'],['docs.pack','Packing list','Packing list','裝箱單'],['docs.bill','Air waybill or bill of lading','Guía aérea o conocimiento de embarque','空運提單或提單'],['docs.origin','Certificate of origin','Certificado de origen','原產地證明'],['docs.permits','Permits and registrations','Permisos y registros','許可與登記'],['docs.tariff','Tariff classification','Clasificación arancelaria','稅則分類'],['docs.customsdoc','Customs documentation','Documentación aduanera','海關文件'],['docs.note','Requirements may vary based on the product and type of operation.','Los requisitos pueden variar según el producto y el tipo de operación.','要求可能因產品與作業類型而有所不同。'],['docs.help','Not sure which documents you need?','¿No sabés qué documentos necesitás?','不確定需要哪些文件？'],['docs.help.p',"Send the basic details of your operation and we'll guide you on the applicable requirements.",'Envíanos los datos básicos de tu operación y te orientamos sobre los requisitos aplicables.','提供作業的基本資料，我們會為您說明適用的要求。'],['docs.cta','Ask about requirements','Consultar requisitos','諮詢要求'],
+    ['sec.finalcta.eyebrow','Courier + Logistics','Courier + Logística','快遞 + 物流'],['final.title','Simpler from origin to Paraguay.','Más simple desde el origen hasta Paraguay.','從產地到巴拉圭更簡單。'],['final.p','From a personal parcel to commercial cargo, we coordinate every stage so you have a clearer process and a single point of contact.','Desde un paquete personal hasta una carga comercial, coordinamos cada etapa para que tengas un proceso más claro y un único punto de contacto.','從個人包裹到商業貨物，我們協調每個階段，讓您的流程更清楚，並有單一聯絡窗口。'],['final.1','Guidance before shipping','Orientación antes del envío','出貨前的指引'],['final.2','International coordination','Coordinación internacional','國際協調'],['final.3','Process tracking','Seguimiento del proceso','流程追蹤'],['final.4','Document support when applicable','Apoyo documental cuando corresponda','必要時提供文件支援'],['final.5','Logistics in Paraguay','Logística en Paraguay','巴拉圭境內物流'],
+    ['sec.contact.eyebrow','Quote your shipment','Cotizá tu envío','為您的貨件報價'],['contact.title','Tell us what you need to bring.','Contanos qué necesitás traer.','告訴我們您需要帶什麼。'],['contact.p','Share the basic details of your parcel or cargo and the NexCourier team can advise you on the best option.','Compartinos los datos básicos de tu paquete o carga y el equipo de NexCourier podrá orientarte sobre la mejor alternativa.','提供您包裹或貨物的基本資料，NexCourier 團隊將為您建議最佳方案。'],
+    ['contact.location','Location','Ubicación','所在地'],['contact.paraguay','Paraguay','Paraguay','巴拉圭'],['contact.whatsapp','WhatsApp','WhatsApp','WhatsApp'],['contact.tbc','Contact details to be confirmed','Datos de contacto a confirmar','聯絡資料待確認'],['contact.email','Email','Email','電子郵件'],['contact.attention','Support','Atención','客戶服務'],['contact.stepbystep','We coordinate each shipment step by step','Coordinamos cada envío paso a paso','我們逐步協調每一件貨件'],
+    ['form.title','Quote request','Solicitud de cotización','報價申請'],['form.private','All information is handled confidentially.','Todos los datos son tratados de forma confidencial.','所有資料均採保密方式處理。'],['form.name','Full name','Nombre completo','姓名'],['form.company','Company (optional)','Empresa (opcional)','公司（選填）'],['form.phone','Phone / WhatsApp','Teléfono / WhatsApp','電話 / WhatsApp'],['form.shiptype','Type of shipment','Tipo de envío','貨件類型'],['form.select','Select an option','Seleccioná una opción','請選擇'],
+    ['opt.personal','Personal parcel','Paquete personal','個人包裹'],['opt.purchase','International purchase','Compra internacional','國際購物'],['opt.commercial','Commercial cargo','Carga comercial','商業貨物'],['opt.import','Import','Importación','進口'],['opt.export','Export','Exportación','出口'],['opt.logistics','Logistics inquiry','Consulta logística','物流諮詢'],['opt.other','Other','Otro','其他'],
+    ['form.origin','Origin','Origen','起運地'],['form.destination','Destination','Destino','目的地'],['form.product','Type of product or cargo','Tipo de producto o carga','產品或貨物類型'],['form.message','Message','Mensaje','訊息'],['form.submit','Request a quote','Solicitar cotización','申請報價'],['form.reply',"We'll review your request and contact you with the next steps.",'Revisaremos tu solicitud y te contactaremos con los siguientes pasos.','我們將審核您的申請並與您聯絡後續步驟。'],
+    ['ph.name','Your name','Tu nombre','您的姓名'],['ph.company','Company name','Nombre de la empresa','公司名稱'],['ph.origin','City / country of origin','Ciudad / país de origen','起運城市／國家'],['ph.destination','Destination city / country','Ciudad / país de destino','目的城市／國家'],['ph.product','Example: electronics, clothing, parts...','Ej: electrónica, ropa, repuestos...','例如：電子產品、服飾、零件等'],['ph.message','Tell us the details of your shipment','Contanos los detalles de tu envío','請提供您貨件的詳細資訊'],
+    ['footer.p','NexCourier connects Paraguay with the world through courier solutions, international logistics, and support for people and businesses.','NexCourier conecta Paraguay con el mundo a través de soluciones de courier, logística internacional y acompañamiento para personas y empresas.','NexCourier 透過快遞方案、國際物流以及對個人與企業的支援，將巴拉圭與世界相連。'],
+    ['foot.services','Services','Servicios','服務'],['foot.companies','Business','Empresas','企業'],['foot.company','Company','Empresa','公司'],['foot.contact','Contact','Contacto','聯絡'],
+    ['foot.imports','Imports','Importaciones','進口業務'],['foot.customs','Customs solutions','Soluciones aduaneras','報關解決方案'],['foot.quotes','Quotes','Cotizaciones','報價'],
+    ['foot.cline2','International courier and logistics','Courier y logística internacional','國際快遞與物流'],['foot.cline4','We coordinate every shipment','Coordinamos cada envío','我們協調每一件貨件'],
+    ['footer.privacy','Privacy Policy','Política de privacidad','隱私權政策'],['footer.terms','Terms and Conditions','Términos y condiciones','條款與條件'],['footer.copy','© 2026 NexCourier · Demo','© 2026 NexCourier · Demo','© 2026 NexCourier · 展示'],
+    ['toast.received','Request received.','Solicitud recibida.','已收到申請。'],['toast.advisor','The NexCourier team will contact you.','El equipo de NexCourier se pondrá en contacto contigo.','NexCourier 團隊將與您聯絡。'],
+    ['modal.service','Service','Servicio','服務'],['modal.faq','Frequently asked questions','Preguntas frecuentes','常見問題'],['modal.quote','Request a quote','Solicitar cotización','申請報價'],
+    ['mb.c1','International parcel coordination','Coordinación de paquetes internacionales','國際包裹協調'],['mb.c2','Guidance before buying or shipping','Orientación antes de comprar o enviar','購買或出貨前的指引'],['mb.c3','Tracking throughout the process','Seguimiento durante el proceso','全程流程追蹤'],['mb.c4','Personalized support','Acompañamiento personalizado','個人化陪伴'],
+    ['mb.cm1','Guidance on the buying process','Orientación sobre el proceso de compra','購物流程指引'],['mb.cm2','Coordination of parcel reception','Coordinación de la recepción del paquete','包裹收件協調'],['mb.cm3','Shipment tracking','Seguimiento del envío','貨件追蹤'],['mb.cm4','Document support when applicable','Apoyo documental cuando corresponde','必要時提供文件支援'],['mb.cm5','Support for people and businesses','Atención para personas y empresas','為個人與企業提供服務'],
+    ['mb.cg4','Transit tracking','Seguimiento del tránsito','運輸追蹤'],['mb.cg5','Customs management when applicable','Gestión aduanera cuando corresponde','必要時辦理海關'],
+    ['mb.l3','Delivery or pickup in Paraguay','Entrega o retiro en Paraguay','在巴拉圭配送或自取'],['mb.l4','A single point of contact','Un único punto de contacto','單一聯絡窗口'],
+    ['fq.c1','What kind of shipments can I make with NexCourier?','¿Qué tipo de envíos puedo realizar con NexCourier?','我可以透過 NexCourier 寄送哪些貨件？'],['fq.c1a','We coordinate international parcels and cargo for people and businesses; depending on the case, we advise you on the best option.','Coordinamos paquetes y cargas internacionales para personas y empresas; según el caso, te orientamos sobre la mejor alternativa.','我們為個人與企業協調國際包裹與貨物；視情況為您建議最佳方案。'],
+    ['fq.c2','How do I request a quote?','¿Cómo solicito una cotización?','我要如何申請報價？'],['fq.c2a','Fill out the contact form with the basic details of your shipment and we will contact you with the next steps.','Completá el formulario de contacto con los datos básicos de tu envío y te contactaremos con los siguientes pasos.','填寫聯絡表單並提供貨件基本資料，我們會與您聯絡後續步驟。'],
+    ['fq.c3','What information do I need to get a quote?','¿Qué información necesito para cotizar?','報價需要哪些資訊？'],['fq.c3a','With the origin, the type of product, and an idea of the volume or weight, we can already advise you.','Con el origen, el tipo de producto y una idea del volumen o peso ya podemos orientarte.','有起運地、產品類型以及大致的體積或重量，我們即可為您提供建議。'],
+    ['fq.c4','Do you work with people and businesses?','¿Trabajan con personas y empresas?','你們同時服務個人與企業嗎？'],['fq.c4a','Yes, we handle personal shipments as well as commercial operations.','Sí, atendemos envíos personales y también operaciones comerciales.','是的，我們處理個人貨件與商業作業。'],
+    ['fq.cm1','Can you help with a purchase abroad?','¿Pueden ayudarme con una compra en el exterior?','你們能協助我在海外購物嗎？'],['fq.cm1a','Yes, we guide you on how to coordinate receiving purchases made at overseas stores and suppliers.','Sí, te orientamos sobre cómo coordinar la recepción de compras realizadas en tiendas y proveedores del exterior.','可以，我們會指導您如何安排收取海外商店與供應商的購物。'],
+    ['fq.cm2','How do I know which service I need?','¿Cómo sé qué servicio necesito?','我如何知道需要哪項服務？'],['fq.cm2a','Tell us what you want to bring and we help you identify the most suitable option.','Contanos qué querés traer y te ayudamos a identificar la alternativa más adecuada.','告訴我們您想帶什麼，我們協助您找出最合適的方案。'],
+    ['fq.cm3','What information do I need to quote a shipment?','¿Qué información necesito para cotizar un envío?','報價一件貨件需要哪些資訊？'],['fq.cm3a','The origin, the type of product, and the basic details of the shipment allow us to advise you.','El origen, el tipo de producto y los datos básicos del envío nos permiten orientarte.','起運地、產品類型與貨件基本資料，讓我們得以為您提供建議。'],
+    ['fq.cm4','Can I receive several parcels?','¿Puedo recibir varios paquetes?','我可以收取多個包裹嗎？'],['fq.cm4a','Yes, we assess each case to coordinate the best way to receive your purchases.','Sí, evaluamos cada caso para coordinar la mejor forma de recibir tus compras.','可以，我們會評估每個情況，協調收取您購物的最佳方式。'],
+    ['fq.cg1','Can you help with a commercial import?','¿Pueden ayudarme con una importación comercial?','你們能協助商業進口嗎？'],['fq.cg1a','Yes, we support commercial operations that require international coordination and logistics tailored to each cargo.','Sí, acompañamos operaciones comerciales que requieren coordinación internacional y logística adaptada a cada carga.','可以，我們支援需要國際協調與客製物流的商業作業。'],
+    ['fq.cg2','What documents might a cargo need?','¿Qué documentos puede necesitar una carga?','一批貨物可能需要哪些文件？'],['fq.cg2a','It may require a commercial invoice, packing list, air waybill or bill of lading, among others; requirements vary by product.','Puede requerir factura comercial, packing list, guía aérea o conocimiento de embarque, entre otros; los requisitos varían según el producto.','可能需要商業發票、裝箱單、空運提單或提單等；要求依產品而異。'],
+    ['fq.cg3','Do you work with different types of cargo?','¿Trabajan con distintos tipos de carga?','你們處理不同類型的貨物嗎？'],['fq.cg3a','Yes, we assess the origin, volume, and type of cargo to propose the best option.','Sí, analizamos el origen, el volumen y el tipo de carga para proponer la mejor alternativa.','是的，我們會分析起運地、體積與貨物類型，提出最佳方案。'],
+    ['fq.cg4','Do you offer cargo consolidation?','¿Ofrecen consolidación de carga?','你們提供併櫃服務嗎？'],['fq.cg4a','Yes, we assess consolidation alternatives when they benefit your operation.','Sí, evaluamos alternativas de consolidación cuando conviene a tu operación.','是的，若對您的作業有利，我們會評估併櫃方案。'],
+    ['fq.l1','How does delivery in Paraguay work?','¿Cómo funciona la entrega en Paraguay?','在巴拉圭如何配送？'],['fq.l1a','Once your shipment is available, we coordinate delivery or pickup based on the contracted service.','Una vez disponible tu envío, coordinamos la entrega o el retiro según el servicio contratado.','貨件備妥後，我們依所選服務安排配送或自取。'],
+    ['fq.l2','Can I track the status of my shipment?','¿Puedo seguir el estado de mi envío?','我可以追蹤貨件狀態嗎？'],['fq.l2a','We keep you informed about the stages of the process while coordinating your shipment.','Te mantenemos informado sobre las etapas del proceso durante la coordinación de tu envío.','在協調您貨件的過程中，我們會隨時告知各階段進度。'],
+    ['fq.l3','Do you coordinate several stages of the route?','¿Coordinan varias etapas del trayecto?','你們會協調多段運輸嗎？'],['fq.l3a','Yes, we integrate the different logistics stages so you have a single point of contact.','Sí, integramos las distintas etapas logísticas para que tengas un único punto de contacto.','是的，我們整合各物流階段，讓您有單一聯絡窗口。'],
+    ['fq.l4','Do you serve people and businesses?','¿Atienden personas y empresas?','你們服務個人與企業嗎？'],['fq.l4a','Yes, we coordinate both personal shipments and business operations.','Sí, coordinamos tanto envíos personales como operaciones empresariales.','是的，我們同時協調個人貨件與企業作業。'],
+    ['aria.language','Language selector','Selector de idioma','語言選擇器'],['aria.close','Close','Cerrar','關閉']
+  ];
+  rows=rows.concat([
+    ['nav.rates','Rates','Tarifas','費率'],['nav.help','Help','Ayuda','幫助'],['nav.track','Track','Rastrear','追蹤'],['nav.login','Sign in','Ingresar','登入'],['cta.locker','Create my locker','Crear mi casillero','建立我的轉運地址'],
+    ['hero.customerPrefix','Shop abroad, receive in Paraguay ','Comprá en el exterior, recibí en Paraguay ','海外購物，在巴拉圭收件'],
+    ['hero.customerWords','simply.|with clear information.|with support.|your way.','de forma simple.|con información clara.|con acompañamiento.|a tu manera.','簡單完成。|資訊清楚。|全程支援。|依您的方式。'],
+    ['m.nb1','International shopping','Compras internacionales','國際購物'],['m.ns1','Your shopping journey, explained step by step','Tu recorrido de compra, explicado paso a paso','逐步說明您的購物流程'],
+    ['m.nb2','Your locker','Tu casillero','您的轉運地址'],['m.ns2','ID and address assigned by NexCourier','Identificador y dirección asignados por NexCourier','由 NexCourier 提供識別碼與地址'],
+    ['m.ns3','Information at every available stage','Información durante cada etapa disponible','提供每個可用階段的資訊'],['m.ns4','Separate paths for parcels and cargo','Un camino para paquetes y otro para cargas','包裹與貨物採不同流程'],
+    ['m.nb5','Support in Paraguay','Atención en Paraguay','巴拉圭在地支援'],['m.ns5','Guidance when you need help','Acompañamiento cuando necesitás ayuda','需要時提供協助'],
+    ['m.nb6','Coordinated logistics','Logística coordinada','協調物流'],['m.ns6','Clear processes based on shipment type','Procesos claros según el tipo de envío','依貨件類型提供清楚流程'],
+    ['quick.eyebrow','Manage your shipment','Gestioná tu envío','管理您的貨件'],['quick.title','Everything you need, in one place.','Todo lo que necesitás, en un solo lugar.','所需工具，集中一處。'],['quick.intro','These tools show the planned flow. Live results will be enabled when tracking and rates are connected.','Estas herramientas muestran el flujo previsto. Los resultados reales se habilitarán al conectar tracking y tarifas.','這些工具展示預定流程；連接追蹤與費率系統後才會提供即時結果。'],
+    ['track.title','Track a parcel','Rastrear paquete','追蹤包裹'],['track.p','Enter the tracking number from your store or carrier.','Ingresá el número de tracking de tu tienda o transportista.','輸入商店或承運商提供的追蹤號碼。'],['track.label','Tracking number','Número de tracking','追蹤號碼'],['track.ph','Example: your tracking number','Ej.: tu número de tracking','例如：您的追蹤號碼'],['track.note','Live lookup will be available when the tracking system is integrated.','La consulta real estará disponible cuando se integre el sistema de tracking.','追蹤系統整合後才會提供即時查詢。'],
+    ['calc.title','Calculate shipping','Calcular envío','計算運費'],['calc.p','Prepare the information needed for an estimate without showing unconfirmed rates.','Prepará los datos que definirán una estimación, sin mostrar tarifas no confirmadas.','先準備估算所需資料，不顯示未確認費率。'],['calc.choose','Select an origin','Seleccioná un origen','選擇起運地'],['calc.assigned','Address assigned by NexCourier','Dirección asignada por NexCourier','NexCourier 指定地址'],['calc.weight','Weight (kg)','Peso (kg)','重量（公斤）'],['calc.size','Dimensions','Dimensiones','尺寸'],['calc.note','Rates and billable-weight rules are pending business confirmation.','Tarifas y reglas de peso facturable pendientes de confirmación comercial.','費率與計費重量規則仍待商務確認。'],
+    ['feedback.track.empty','Enter a tracking number to continue.','Ingresá un número de tracking para continuar.','請輸入追蹤號碼以繼續。'],['feedback.track.pending','Live lookup requires tracking integration. No parcel was searched.','La consulta real requiere integrar el sistema de tracking. No se buscó ningún paquete.','即時查詢需要整合追蹤系統；未查詢任何包裹。'],['feedback.calc.empty','Complete origin and weight to prepare the estimate.','Completá el origen y el peso para preparar la estimación.','填寫起運地與重量以準備估算。'],['feedback.calc.pending','Rates and billable-weight rules are pending configuration. No price was calculated.','La tarifa y la regla de peso facturable siguen pendientes de configuración. No se calculó un precio.','費率與計費重量規則尚待設定；未計算價格。']
+  ]);
+  rows=rows.concat([
+    ['svc.new1','Courier & Locker','Courier y Casillero','快遞與轉運地址'],['svc.new1p','Use the information assigned by NexCourier to identify and receive your international purchases.','Usá los datos asignados por NexCourier para identificar y recibir tus compras internacionales.','使用 NexCourier 提供的資料識別並接收您的國際購物包裹。'],['svc.new2p','We coordinate receiving purchases you make from overseas stores and suppliers.','Coordinamos la recepción de compras que realizás en tiendas y proveedores del exterior.','我們協調接收您向海外商店與供應商購買的商品。'],['svc.new3','Cargo for Business','Carga para Empresas','企業貨運'],['svc.new3p','International coordination for commercial operations based on origin and cargo type.','Coordinación internacional para operaciones comerciales, según el origen y tipo de carga.','依起運地與貨物類型協調商業運輸。'],['svc.new4','Delivery in Paraguay','Entrega en Paraguay','巴拉圭配送'],['svc.new4p','Pickup or delivery options are subject to the contracted service and confirmed coverage.','Opciones de retiro o entrega sujetas al servicio contratado y a la cobertura confirmada.','自取或配送方式依所選服務與已確認覆蓋範圍而定。'],
+    ['about.new1','NexCourier connects customers in Paraguay with purchases and parcels from abroad through a clear, supported courier experience.','NexCourier conecta a clientes en Paraguay con sus compras y paquetes del exterior mediante una experiencia de courier clara y acompañada.','NexCourier 以清楚且有支援的快遞體驗，連結巴拉圭客戶與海外購物包裹。'],['about.new2','We connect parcel identification, logistics coordination, and support at every stage, with a separate path for business needs.','Unimos identificación de paquetes, coordinación logística y soporte en cada etapa, con un camino separado para las necesidades comerciales.','我們整合包裹識別、物流協調與各階段支援，並為企業需求提供獨立流程。'],
+    ['process.n1','Create your locker','Creá tu casillero','建立您的轉運地址'],['process.n1p','Register to receive your ID and the address information assigned by NexCourier.','Registrate para recibir tu identificador y los datos de dirección asignados por NexCourier.','註冊後取得識別碼與 NexCourier 指定地址資料。'],['process.n2','Shop with your details','Comprá usando tus datos','使用您的資料購物'],['process.n2p','Use your NexCourier details when buying. We identify the parcel when it reaches receiving.','Usá tus datos NexCourier al comprar. Identificaremos el paquete cuando llegue a recepción.','購物時使用 NexCourier 資料；包裹抵達收件中心時由我們識別。'],['process.n3','We follow your parcel','Seguimos tu paquete','我們追蹤您的包裹'],['process.n3p','NexCourier receives and processes the parcel before coordinating its journey to Paraguay.','NexCourier recibe y procesa el paquete antes de coordinar su viaje hacia Paraguay.','NexCourier 收件並處理包裹，再安排運往巴拉圭。'],['process.n4','Pick up or receive','Retirá o recibí','自取或收件'],['process.n4p','When available in Paraguay, choose an allowed pickup or delivery option.','Cuando esté disponible en Paraguay, elegí una opción permitida de retiro o entrega.','貨件在巴拉圭備妥後，選擇可用的自取或配送方式。'],
+    ['locker.eyebrow','Your NexCourier locker','Tu casillero NexCourier','您的 NexCourier 轉運地址'],['locker.title','Your locker for shopping abroad.','Tu casillero para comprar en el exterior.','海外購物的專屬轉運地址。'],['locker.p','When you create your account, you will receive an ID and the information to use when shopping. This helps NexCourier recognize your parcel and link it to your registration.','Al crear tu cuenta recibirás un identificador y los datos que debés usar al comprar. Así NexCourier puede reconocer tu paquete y vincularlo con tu registro.','建立帳戶後，您會取得購物時要使用的識別碼與資料，讓 NexCourier 能辨識包裹並連結到您的登記。'],['locker.1','Your code accompanies the recipient name.','Tu código acompaña el nombre del destinatario.','您的代碼需與收件人姓名一同填寫。'],['locker.2','Use the address assigned by NexCourier at checkout.','Usás la dirección asignada por NexCourier al finalizar la compra.','結帳時使用 NexCourier 指定地址。'],['locker.3','Your parcel appears after NexCourier confirms receiving.','Tu paquete aparece cuando NexCourier confirma la recepción.','NexCourier 確認收件後，您的包裹便會顯示。'],['locker.more','Learn about the locker','Conocer el casillero','了解轉運地址'],['locker.data','Receiving details','Datos de recepción','收件資料'],['locker.address','Your NexCourier address','Tu dirección NexCourier','您的 NexCourier 地址'],['demo.example','Example','Ejemplo','範例'],['locker.name','Name','Nombre','姓名'],['locker.namevalue','YOUR NAME + YOUR CODE','TU NOMBRE + TU CÓDIGO','您的姓名 + 您的代碼'],['locker.city','City / State','Ciudad / Estado','城市／州'],['locker.tbc','To be confirmed','A confirmar','待確認'],['locker.id','Identifier','Identificador','識別碼'],['locker.idvalue','Generated when you create your account','Se genera al crear tu cuenta','建立帳戶時產生'],['locker.disclaimer','Visual example. It is not an operating address or real customer data.','Ejemplo visual. No representa una dirección operativa ni datos reales de un cliente.','視覺範例，不代表營運地址或真實客戶資料。'],
+    ['rates.eyebrow','Clear rates','Tarifas claras','清楚費率'],['rates.title','Understand what makes up your shipping cost.','Entendé qué compone el costo de tu envío.','了解運費的組成。'],['rates.p','Published rates should explain billable weight, applicable extras, and the difference between an estimate and the final amount.','La tarifa publicada deberá explicar el peso facturable, los extras que correspondan y la diferencia entre una estimación y el monto final.','公布費率時將說明計費重量、適用附加費，以及估算與最終金額的差異。'],['rates.1','Confirmed rate','Tarifa confirmada','已確認費率'],['rates.2','Billable weight','Peso facturable','計費重量'],['rates.3','Applicable extras','Extras aplicables','適用附加費'],['rates.4','Delivery, if applicable','Entrega, si corresponde','配送（如適用）'],['rates.cta','View rates','Ver tarifas','查看費率']
+  ]);
+  rows=rows.concat([
+    ['why.q1','Check the available stage of your parcel and find the next action in one place.','Consultá la etapa disponible de tu paquete y encontrá la próxima acción en un solo lugar.','在同一處查看包裹目前階段與下一步。'],['why.t1','Clear information','Información clara','清楚資訊'],['why.s1','Every stage in context','Cada etapa en contexto','每個階段都有說明'],['why.q2','When something needs your attention, the site tells you which information or document to prepare.','Cuando algo requiere tu atención, el sitio te indica qué dato o documento necesitás preparar.','需要您處理時，網站會指出要準備的資料或文件。'],['why.t2','Simple actions','Acciones simples','簡單操作'],['why.s2','Visible next steps','Próximos pasos visibles','清楚顯示下一步'],['why.q3','Your locker, parcels, and support connect in one experience.','Tu casillero, tus paquetes y la ayuda necesaria se conectan bajo una misma experiencia.','轉運地址、包裹與支援整合在同一體驗。'],['why.t3','One place','Un solo lugar','集中一處'],['why.s3','Your connected courier journey','Tu recorrido de courier conectado','串連您的快遞流程'],['faq.cta','View frequently asked questions','Ver preguntas frecuentes','查看常見問題'],
+    ['cap.id','Identification','Identificación','識別'],['cap.prealert','Package matching','Vinculación','包裹配對'],['cap.receive','Receiving','Recepción','收件'],['cap.follow','Tracking','Seguimiento','追蹤'],['cap.pickup','Pickup','Retiro','自取'],['cap.support','Support','Soporte','支援'],
+    ['help.eyebrow','Help with your purchase','Ayuda para tu compra','購物協助'],['help.title','Before buying, review what matters.','Antes de comprar, revisá lo importante.','購買前先查看重要資訊。'],['help.p','Some products may be restricted, require prior confirmation, or need special handling depending on their type and operation.','Algunos productos pueden estar restringidos, requerir confirmación previa o necesitar un manejo especial según su tipo y la operación.','部分商品可能受限、需事先確認或依類型與作業方式採特殊處理。'],['help.products','Products and conditions','Productos y condiciones','商品與條件'],['help.demo','This demo does not publish a definitive legal list. Confirm the product before buying.','Esta demo no publica una lista legal definitiva. Confirmá el producto antes de comprar.','本展示不公布最終法律清單；購買前請先確認商品。'],['help.prohibited','Prohibited','Prohibidos','禁止'],['help.confirm','Require confirmation','Requieren confirmación','需確認'],['help.special','Special handling','Manejo especial','特殊處理'],['help.restricted','View restricted products','Ver productos restringidos','查看受限商品'],
+    ['hf.q1','What is a locker?','¿Qué es un casillero?','什麼是轉運地址？'],['hf.a1','It is the set of details assigned to your account to identify purchases you send to NexCourier.','Es el conjunto de datos asignados a tu cuenta para identificar las compras que enviás a NexCourier.','這是分配給帳戶的一組資料，用來識別您寄往 NexCourier 的購物包裹。'],['hf.q2','How do I use my code?','¿Cómo uso mi código?','如何使用我的代碼？'],['hf.a2','Include it with your name exactly as shown in your account. Live activation depends on the registration system.','Incluilo con tu nombre tal como aparezca en los datos de tu cuenta. La activación real depende del sistema de registro.','請依帳戶資料將代碼與姓名一同填寫；實際啟用取決於註冊系統。'],['hf.q3','When does my parcel appear?','¿Cuándo aparece mi paquete?','包裹何時會顯示？'],['hf.a3','Parcel visibility depends on receiving and the future tracking integration.','La visibilidad del paquete dependerá de la recepción y de la futura integración de tracking.','包裹顯示取決於收件與未來的追蹤整合。'],['hf.q4','What is a pre-alert?','¿Qué es una prealerta?','什麼是預報？'],['hf.a4','It is an optional notice with your purchase details. Your parcel can also be identified when it reaches receiving.','Es un aviso opcional con los datos de tu compra. Tu paquete también puede identificarse al llegar a recepción.','這是包含購物資料的選填通知；包裹也可在抵達收件中心時識別。'],['hf.q5','How is the cost calculated?','¿Cómo se calcula el costo?','費用如何計算？'],['hf.a5','The billable-weight rule and rates are pending business confirmation.','La regla de peso facturable y las tarifas están pendientes de confirmación comercial.','計費重量規則與費率仍待商務確認。'],['hf.q6','What if an invoice is missing?','¿Qué hago si falta una factura?','缺少發票怎麼辦？'],['hf.a6','Prepare proof of purchase and contact support to confirm the applicable requirement.','Prepará el comprobante de compra y contactá a soporte para conocer el requisito aplicable.','準備購買證明並聯絡支援，以確認適用要求。'],
+    ['docs.ne','Documentation for your shipment','Documentación según tu envío','依貨件準備文件'],['docs.nt','Requirements depend on what you buy.','Los requisitos dependen de lo que comprás.','所需文件取決於購買商品。'],['docs.np','A personal parcel does not use the same checklist as commercial cargo. Product, value, route, and operation type may change the required documents.','Un paquete personal no usa el mismo checklist que una carga comercial. El producto, el valor, la ruta y el tipo de operación pueden cambiar la documentación necesaria.','個人包裹與商業貨物的清單不同；商品、價值、路線與作業類型都可能改變所需文件。'],['docs.personal','For personal parcels','Para paquetes personales','個人包裹'],['docs.proof','Invoice or receipt','Factura o comprobante','發票或購買證明'],['docs.value','Declared value','Valor declarado','申報價值'],['docs.info','Parcel information','Información del paquete','包裹資訊'],['docs.buytrack','Purchase tracking','Tracking de la compra','購物追蹤'],['docs.extra','Additional document, if applicable','Documento adicional, si aplica','其他文件（如適用）'],['docs.biznote','Commercial cargo may require additional documents within the NexCourier for Business flow.','Las cargas comerciales pueden requerir documentación adicional dentro del flujo de NexCourier Empresas.','商業貨物可能在 NexCourier 企業流程中需要額外文件。'],['docs.nhelp','Does your product require confirmation?','¿Tu producto requiere confirmación?','您的商品需要確認嗎？'],['docs.nhelpp','Review restrictions and contact support before buying when a product needs validation or special handling.','Revisá restricciones y consultá a soporte antes de comprar cuando el producto necesite validación o manejo especial.','商品需要驗證或特殊處理時，購買前請先查看限制並聯絡支援。'],['docs.restrict','Review restrictions','Revisar restricciones','查看限制']
+  ]);
+  rows=rows.concat([
+    ['final.ne','Your next purchase','Tu próxima compra','您的下一次購物'],['final.nt','Your NexCourier locker, ready for your next purchase.','Tu casillero NexCourier, listo para tu próxima compra.','您的 NexCourier 轉運地址，為下一次購物做好準備。'],['final.np','Learn the journey, prepare your information, and start registration. Account creation will be enabled when the portal is integrated.','Conocé el recorrido, prepará tus datos y empezá el registro. La creación efectiva de cuentas se habilitará al integrar el portal.','了解流程、準備資料並開始註冊；入口網站整合後才會正式建立帳戶。'],['final.n1','Your personal identifier','Tu identificador personal','您的個人識別碼'],['final.n2','Assigned receiving details','Datos de recepción asignados','指定收件資料'],['final.n3','Identification at receiving','Identificación al recibir','收件時識別'],['final.n4','Process information','Información del proceso','流程資訊'],['final.n5','Support when you need it','Soporte cuando lo necesitás','需要時提供支援'],
+    ['contact.ne','Contact / Support','Contacto / Soporte','聯絡／支援'],['contact.nt','Need help with the process?','¿Necesitás ayuda con el proceso?','需要流程協助嗎？'],['contact.np','Use this space for a general inquiry. Tracking, registration, and business quotes have separate paths.','Usá este espacio para una consulta general. El tracking, el registro y las cotizaciones empresariales tienen caminos separados.','此處供一般諮詢；追蹤、註冊與企業報價各有獨立流程。'],['contact.hours','Channel and hours pending confirmation','Canal y horarios pendientes de confirmación','聯絡管道與時間待確認'],['form.nt','General inquiry','Consulta general','一般諮詢'],['form.np','This form is a demo interface and does not send data yet.','Este formulario es una interfaz de demostración y todavía no envía datos.','此表單為展示介面，目前不會傳送資料。'],['form.reason','Reason','Motivo','原因'],['form.o1','Locker inquiry','Consulta sobre casillero','轉運地址諮詢'],['form.o2','Help with a parcel','Ayuda con un paquete','包裹協助'],['form.o3','Products and restrictions','Productos y restricciones','商品與限制'],['form.nph','Tell us what you need help with','Contanos en qué necesitás ayuda','告訴我們您需要什麼協助'],['form.review','Review inquiry','Revisar consulta','檢查諮詢'],['form.nnote','No information will be sent until an official support channel is connected.','No se enviará información hasta conectar un canal oficial de soporte.','在連接官方支援管道前不會傳送任何資料。'],
+    ['footer.np','NexCourier connects your international shopping with Paraguay through a clear courier experience, with an additional path for business.','NexCourier conecta tus compras internacionales con Paraguay mediante una experiencia de courier clara, con un camino adicional para empresas.','NexCourier 以清楚的快遞體驗連結您的國際購物與巴拉圭，並提供企業專屬流程。'],['foot.bizlog','Business logistics','Logística empresarial','企業物流'],['foot.docs','Applicable documentation','Documentación aplicable','適用文件'],['foot.bizquote','Business quote','Cotización empresarial','企業報價'],['foot.faq','Frequently asked questions','Preguntas frecuentes','常見問題'],['foot.supporttbc','Support channel to be confirmed','Canal de soporte a confirmar','支援管道待確認'],['foot.policy','Policy pending','Política pendiente','政策待確認'],['foot.termsp','Terms pending','Términos pendientes','條款待確認'],
+    ['toast.demo','Sending is unavailable in this demo.','Envío no disponible en esta demo.','此展示無法傳送。'],['toast.demo.p','Your information was not sent. An official support channel still needs to be connected.','Tus datos no fueron enviados. Falta conectar un canal oficial de soporte.','您的資料未傳送；仍需連接官方支援管道。']
+  ]);
+  rows=rows.concat([
+    ['aria.locker.example','Locker details example','Ejemplo de datos de casillero','轉運地址資料範例'],
+    ['modal.service.cta','Ask about this service','Consultar este servicio','洽詢此服務'],
+    ['modal.buy.help','Contact support before buying when a product needs validation or special handling.','Consultá a soporte antes de comprar cuando el producto necesite validación o manejo especial.','商品需要驗證或特殊處理時，購買前請聯絡支援。'],
+    ['modal.biz.scope','Service availability and scope require business confirmation.','La disponibilidad del servicio y su alcance requieren confirmación comercial.','服務是否提供及其範圍仍需商務確認。'],
+    ['modal.biz.docs','Requirements depend on the product, value, route, and type of operation.','Los requisitos dependen del producto, el valor, la ruta y el tipo de operación.','要求取決於商品、價值、路線與作業類型。'],
+    ['modal.biz.mode','Each mode must be confirmed based on origin, volume, and cargo type.','Cada modalidad debe confirmarse según el origen, el volumen y el tipo de carga.','每種運輸方式須依出發地、體積與貨物類型確認。'],
+    ['modal.biz.consolidation','Consolidation requires business confirmation before it is presented as an active service.','La consolidación requiere confirmación comercial antes de presentarse como servicio activo.','貨物合併在列為正式服務前仍需商務確認。'],
+    ['modal.delivery.scope','Pickup or delivery depends on the contracted service and confirmed coverage.','La opción de retiro o entrega dependerá del servicio contratado y de la cobertura confirmada.','取件或配送選項取決於已簽訂服務與確認的涵蓋範圍。'],
+    ['modal.track.scope','Available information depends on the future tracking integration.','La información disponible dependerá de la futura integración de tracking.','可用資訊取決於後續的追蹤系統整合。'],
+    ['modal.coord.scope','Coordination will be defined according to the confirmed service for each shipment.','La coordinación se definirá según el servicio confirmado para cada envío.','協調方式將依每件貨件所確認的服務決定。'],
+    ['modal.paths','The website keeps separate paths for personal parcels and business operations.','La web mantiene caminos separados para paquetes personales y operaciones empresariales.','網站為個人包裹與企業作業保留不同流程。'],
+    ['docs.new.eyebrow','Documentation for your shipment','Documentación según tu envío','依您的貨件準備文件'],
+    ['final.new.eyebrow','Your next purchase','Tu próxima compra','您的下一次購物'],
+    ['contact.new.eyebrow','Contact / Support','Contacto / Soporte','聯絡／支援']
+  ]);
+  rows.forEach(function(r){T.en[r[0]]=r[1];T.es[r[0]]=r[2];T.zh[r[0]]=r[3];});
+  var reverse={};rows.forEach(function(r){r.slice(1).forEach(function(value){if(value&&typeof reverse[value]==='undefined')reverse[value]=r[0];});});
+  function getText(key,fallback){return (T[currentLang]&&T[currentLang][key])||T.es[key]||fallback||'';}
+  function replaceValue(value){var key=reverse[String(value).trim()];return key?getText(key,value):value;}
+  function translateTextNode(node){if(!node||!node.nodeValue||!node.nodeValue.trim())return;var parent=node.parentElement;if(!parent||/^(SCRIPT|STYLE|NOSCRIPT)$/.test(parent.tagName))return;var raw=node.nodeValue,trim=raw.trim(),next=replaceValue(trim);if(next!==trim)node.nodeValue=raw.replace(trim,next);}
+  function translateTree(root){
+    if(!root)return;if(root.nodeType===3){translateTextNode(root);return;}if(root.nodeType!==1&&root.nodeType!==9)return;
+    var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),node;while((node=walker.nextNode()))translateTextNode(node);
+    var elements=root.nodeType===1?[root].concat(Array.from(root.querySelectorAll('*'))):Array.from(root.querySelectorAll('*'));
+    elements.forEach(function(el){['placeholder','aria-label','title','data-placeholder'].forEach(function(attr){if(el.hasAttribute&&el.hasAttribute(attr)){var value=el.getAttribute(attr),next=replaceValue(value);if(next!==value)el.setAttribute(attr,next);}});});
+  }
+  function translateDataNodes(){document.querySelectorAll('[data-i18n]').forEach(function(el){var value=getText(el.getAttribute('data-i18n'),'');if(!value)return;if(value.indexOf('<')>-1||el.getAttribute('data-i18n-html')==='true')el.innerHTML=value;else if(!el.children.length)el.textContent=value;else{var node=Array.from(el.childNodes).find(function(n){return n.nodeType===3&&n.nodeValue.trim();});if(node)node.nodeValue=node.nodeValue.replace(node.nodeValue.trim(),value);}});}
+  function refreshDynamicContentAfterLangChange(){translateTree(document.body);}
+  function applyLang(lang){
+    currentLang=/^(en|es|zh)$/.test(lang)?lang:'es';
+    var heroHeading=document.querySelector('.hero-copy h1'),heroWord=document.getElementById('heroRot');
+    if(heroHeading&&heroWord){
+      heroHeading.childNodes[0].nodeValue=getText('hero.customerPrefix','');
+      heroWord.setAttribute('data-words',getText('hero.customerWords',''));
+      heroWord.textContent=getText('hero.customerWords','').split('|')[0]||heroWord.textContent;
+    }
+    translateDataNodes();refreshDynamicContentAfterLangChange();
+    document.documentElement.lang=currentLang==='zh'?'zh-Hant':currentLang;
+    document.title=currentLang==='en'?'NexCourier — International shopping and courier in Paraguay':currentLang==='zh'?'NexCourier — 巴拉圭國際購物與快遞':'NexCourier — Compras y courier internacional en Paraguay';
+    document.querySelectorAll('.site-lang button').forEach(function(btn){var active=btn.getAttribute('data-lang')===currentLang;btn.classList.toggle('is-active',active);btn.setAttribute('aria-pressed',active?'true':'false');});
+    localStorage.setItem(LANG_KEY,currentLang);
+  }
+  function setupLangSwitcher(){document.querySelectorAll('.site-lang button').forEach(function(btn){btn.addEventListener('click',function(){applyLang(btn.getAttribute('data-lang'));});});}
+  var observer=new MutationObserver(function(records){records.forEach(function(record){record.addedNodes.forEach(translateTree);});});observer.observe(document.body,{childList:true,subtree:true});
+  setupLangSwitcher();applyLang(localStorage.getItem(LANG_KEY)||'es');
+})();
+</script>
+</body>
+</html>
