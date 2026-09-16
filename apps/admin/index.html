@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#071a34">
-  <title>NexCourier Admin — Standard Demo</title>
+  <title>NexCourier Admin — Demo</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=standard-polish-03">
+  <link rel="stylesheet" href="admin.css?v=premium-demo-01">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -47,7 +47,7 @@
           <img src="../../shared/assets/nexcourier-logo-transparent.png" alt="">
           <span><strong>NexCourier</strong><small>Admin</small></span>
         </a>
-        <span class="standard-chip">Standard</span>
+        <span class="standard-chip" id="productChip">Standard</span>
       </div>
 
       <nav class="side-nav" id="mainNav" aria-label="Navegación principal">
@@ -76,6 +76,25 @@
           <a href="?page=payments" data-route="payments"><svg><use href="#i-card"/></svg><span>Pagos</span></a>
           <a href="?page=billing" data-route="billing"><svg><use href="#i-receipt"/></svg><span>Facturación</span></a>
         </div>
+        <div class="nav-section premium-nav" data-premium-only>
+          <p>Finanzas Premium</p>
+          <a href="?page=finance&amp;mode=premium" data-route="finance"><svg><use href="#i-card"/></svg><span>Resumen financiero</span></a>
+          <a href="?page=expenses&amp;mode=premium" data-route="expenses"><svg><use href="#i-receipt"/></svg><span>Gastos</span></a>
+          <a href="?page=receipts&amp;mode=premium" data-route="receipts"><svg><use href="#i-file"/></svg><span>Comprobantes</span></a>
+          <a href="?page=reports&amp;mode=premium" data-route="reports"><svg><use href="#i-history"/></svg><span>Reportes</span></a>
+        </div>
+        <div class="nav-section premium-nav" data-premium-only>
+          <p>Personal</p>
+          <a href="?page=personnel&amp;mode=premium" data-route="personnel"><svg><use href="#i-users"/></svg><span>Empleados</span></a>
+          <a href="?page=attendance&amp;mode=premium" data-route="attendance"><svg><use href="#i-check"/></svg><span>Asistencia</span></a>
+          <a href="?page=schedules&amp;mode=premium" data-route="schedules"><svg><use href="#i-history"/></svg><span>Horarios</span></a>
+          <a href="?page=overtime&amp;mode=premium" data-route="overtime"><svg><use href="#i-alert"/></svg><span>Horas extra</span></a>
+          <a href="?page=personnel-payments&amp;mode=premium" data-route="personnel-payments"><svg><use href="#i-card"/></svg><span>Pagos personal</span></a>
+        </div>
+        <div class="nav-section premium-nav" data-premium-only>
+          <p>AI Premium</p>
+          <a href="?page=ai-coworker&amp;mode=premium" data-route="ai-coworker"><svg><use href="#i-grid"/></svg><span>✦ AI Coworker</span></a>
+        </div>
         <div class="nav-section">
           <p>Sistema</p>
           <a href="?page=team" data-route="team"><svg><use href="#i-team"/></svg><span>Equipo</span></a>
@@ -101,6 +120,10 @@
           <div class="search-results" id="searchResults" role="listbox" hidden></div>
         </div>
         <div class="topbar-actions">
+          <div class="mode-switch" aria-label="Modo de demostración">
+            <button type="button" data-action="set-mode" data-mode="standard">Standard</button>
+            <button type="button" data-action="set-mode" data-mode="premium">✦ Premium AI</button>
+          </div>
           <span class="environment-badge"><i></i>Entorno Demo</span>
           <div class="notification-wrap">
             <button class="icon-btn notification-btn" type="button" data-action="toggle-notifications" aria-label="Abrir notificaciones" aria-expanded="false"><svg><use href="#i-bell"/></svg><span>3</span></button>
@@ -111,6 +134,8 @@
         </div>
       </header>
       <main class="view" id="appView" tabindex="-1" aria-live="polite"></main>
+      <button class="ai-quick-tab" type="button" data-action="toggle-ai-quick" data-premium-only aria-controls="aiQuickPanel">✦ AI</button>
+      <aside class="ai-quick-panel" id="aiQuickPanel" data-premium-only aria-label="AI Quick" hidden></aside>
     </div>
   </div>
 
@@ -130,6 +155,7 @@
 
   <script src="../../shared/data/demo-data.js"></script>
   <script src="data/admin-demo-data.js"></script>
-  <script src="admin.js?v=standard-polish-03"></script>
+  <script src="data/premium-demo-data.js"></script>
+  <script src="admin.js?v=premium-demo-01"></script>
 </body>
 </html>

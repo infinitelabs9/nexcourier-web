@@ -3,6 +3,7 @@
 
   const canonical = global.NEXCOURIER_DEMO_DATA;
   const data = global.NEXCOURIER_ADMIN_DEMO;
+  const premium = global.NEXCOURIER_PREMIUM_DEMO;
   const view = document.querySelector("#appView");
   const sidebar = document.querySelector("#sidebar");
   const globalSearch = document.querySelector("#globalSearch");
@@ -10,8 +11,9 @@
   const notificationPanel = document.querySelector("#notificationPanel");
   const modalLayer = document.querySelector("#modalLayer");
   const toast = document.querySelector("#toast");
+  const aiQuickPanel = document.querySelector("#aiQuickPanel");
 
-  if (!canonical || !data || !view) {
+  if (!canonical || !data || !premium || !view) {
     throw new Error("No se pudo iniciar NexCourier Admin Demo.");
   }
 
@@ -22,6 +24,12 @@
     deliveryTab: "pickup",
     shipmentDeparted: false,
     sidebarCollapsed: false,
+    expenseTab: "Todos",
+    aiQuickOpen: false,
+    coworkerPrompt: "",
+    aiQuickPrompt: "",
+    aiQuickAnswer: "",
+    coworkerAnswer: "",
     toastTimer: null,
   };
 
@@ -32,7 +40,21 @@
     arrivals: "Llegadas Paraguay", customers: "Clientes", customer: "Detalle de cliente",
     support: "Soporte", deliveries: "Retiros / Delivery", payments: "Pagos",
     billing: "Facturación", team: "Equipo", audit: "Auditoría", settings: "Configuración",
+    finance: "Finanzas", expenses: "Gastos", expense: "Detalle de gasto",
+    receipts: "Comprobantes", reports: "Reportes", personnel: "Personal",
+    employee: "Detalle de empleado", attendance: "Asistencia", schedules: "Horarios",
+    overtime: "Horas extra", "personnel-payments": "Pagos personal", "ai-coworker": "AI Coworker",
   };
+
+  const premiumPages = ["finance", "expenses", "expense", "receipts", "reports", "personnel", "employee", "attendance", "schedules", "overtime", "personnel-payments", "ai-coworker"];
+
+  function activeMode() {
+    return new URLSearchParams(global.location.search).get("mode") === "premium" ? "premium" : "standard";
+  }
+
+  function isPremium() {
+    return activeMode() === "premium";
+  }
 
   function esc(value) {
     return String(value == null ? "" : value).replace(/[&<>"']/g, function replace(character) {
@@ -45,7 +67,7 @@
   }
 
   function routeHref(page, id) {
-    const params = new URLSearchParams({ page: page });
+    const params = new URLSearchParams({ page: page, mode: activeMode() });
     if (id) params.set("id", id);
     return "?" + params.toString();
   }
@@ -75,7 +97,7 @@
     return '<div class="empty-state">' + icon("search") + "<strong>" + esc(title) + "</strong><span>" + esc(message) + "</span></div>";
   }
 
-  function renderDashboard() {
+  function renderStandardDashboard() {
     const metricVisuals = [
       ["blue", "box"], ["critical", "alert"], ["warning", "file"], ["blue", "plane"],
       ["slate", "arrival"], ["success", "check"], ["warning", "truck"],
@@ -102,6 +124,53 @@
       '<section class="metric-grid" aria-label="Indicadores operativos">' + metricCards + "</section>" +
       '<section class="analytics-grid" aria-label="Analítica operativa"><article class="panel trend-panel"><div class="panel-head"><div><h2>Flujo de recepción</h2><p>Paquetes procesados durante los últimos siete días.</p></div><span class="analytics-total"><strong>456</strong><small>esta semana</small></span></div><div class="chart-shell"><div class="chart-scale" aria-hidden="true"><span>100</span><span>50</span><span>0</span></div><div class="trend-chart" role="img" aria-label="Paquetes procesados: lunes 52, martes 68, miércoles 61, jueves 78, viernes 82, sábado 44 y hoy 71">' + weeklyBars + '</div></div><div class="chart-foot"><span><i></i>Volumen procesado</span><strong>Hoy: 71 paquetes</strong></div></article><div class="analytics-side"><article class="panel queue-panel"><div class="panel-head"><div><h2>Distribución de colas</h2><p>Capacidad operativa utilizada por estado.</p></div></div><div class="queue-list">' + queueRows + '</div></article><article class="growth-card"><div><span class="growth-label">Crecimiento de clientes</span><strong>+8.9%</strong><small>vs. mes anterior · Datos demo</small></div><div class="growth-progress" role="img" aria-label="65 por ciento de avance del objetivo demo"><span>65<small>%</small></span></div><p>Avance del objetivo demo</p></article></div></section>' +
       '<section class="dashboard-grid"><div class="panel priority-panel"><div class="panel-head"><div><h2>Prioridades</h2><p>Trabajo que requiere atención hoy.</p></div><span class="panel-count">3 abiertas</span></div><div class="priority-list">' + priorities + '</div></div><aside class="shipment-spotlight"><span class="spotlight-label">Próximo envío</span><h2>' + esc(shipment.shipmentId) + '</h2><p class="spotlight-route"><span>Miami</span><i></i><span>Asunción</span></p><div class="spotlight-stats"><span><small>Paquetes</small><strong>' + esc(shipment.packageCount) + '</strong></span><span><small>Peso</small><strong>' + esc(shipment.grossWeight) + '</strong></span><span><small>Salida</small><strong>18 Sep · 21:30</strong></span></div><div class="spotlight-readiness"><span><strong>174 listos</strong><small>10 por revisar</small></span><div><i style="width:94.6%"></i></div></div>' + routeButton("Ver envío", "shipment", shipment.shipmentId, "button--primary") + '</aside><div class="panel activity-panel"><div class="panel-head"><div><h2>Actividad reciente</h2><p>Últimos movimientos en la operación.</p></div><button class="text-link" type="button" data-route="audit">Ver auditoría</button></div><div class="activity-list">' + activity + "</div></div></section>";
+  }
+
+  function renderDashboard() {
+    return renderStandardDashboard() + (isPremium() ? renderPremiumDashboardAdditions() : "");
+  }
+
+  function renderPremiumDashboardAdditions() {
+    return '<section class="premium-dashboard-stack"><article class="panel ai-brief"><div class="premium-section-mark"><span>✦</span></div><div class="ai-brief-copy"><div class="panel-head"><div><span class="premium-kicker">AI Daily Brief</span><h2>Hoy hay 3 áreas que requieren atención.</h2><p>Resumen determinístico preparado con datos de esta demostración.</p></div>' + badge("Premium", "warning") + '</div><ol class="brief-list"><li><b>1</b><span><strong>Shipment de hoy</strong><small>10 casos requieren revisión</small></span></li><li><b>2</b><span><strong>Paquetes sin identificar</strong><small>4 casos abiertos</small></span></li><li><b>3</b><span><strong>Documentos</strong><small>7 pendientes</small></span></li></ol><div class="card-actions"><button class="button button--navy" type="button" data-route="ai-coworker">Abrir en Coworker</button><button class="button button--quiet" type="button" data-action="toggle-ai-quick">Ver detalle</button></div></div></article>' +
+      '<article class="panel command-center"><div class="panel-head"><div><span class="premium-kicker">Centro de control</span><h2>Gestión en una sola vista</h2><p>Operación, finanzas, personal y excepciones.</p></div><span class="demo-label">Datos demo</span></div><div class="command-grid"><button type="button" data-route="shipments"><small>Operación</small><strong>94.6%</strong><span>preparada</span></button><button type="button" data-route="finance"><small>Gastos mes</small><strong>DEMO</strong><span>total simulado</span></button><button type="button" data-route="attendance"><small>Personal hoy</small><strong>17 / 18</strong><span>presentes</span></button><button type="button" data-route="overtime"><small>Horas extra</small><strong>6.5 h</strong><span>pendientes</span></button><button type="button" data-route="expenses"><small>Aeropuerto</small><strong>DEMO</strong><span>gasto mensual</span></button><button type="button" data-route="unidentified"><small>Incidencias</small><strong>11</strong><span>requieren atención</span></button></div><div class="card-actions"><button class="button button--quiet" type="button" data-route="finance">Ver finanzas</button><button class="button button--quiet" type="button" data-route="personnel">Ver personal</button><button class="button button--primary" type="button" data-route="ai-coworker">Abrir AI Coworker</button></div></article></section>';
+  }
+
+  function financeMetricCards() {
+    return premium.finance.cards.map(function financeCard(item, index) {
+      return '<article class="management-metric" data-tone="' + (index === 4 ? "positive" : "neutral") + '"><span>' + esc(item[0]) + '</span><strong>' + esc(item[1]) + '</strong><small>' + esc(item[2]) + '</small></article>';
+    }).join("");
+  }
+
+  function renderFinance() {
+    const familyCards = [
+      ["Operativos", "Courier, aeropuerto, carga, warehouse y delivery.", "₲ 74.850.000 demo", "expenses"],
+      ["Administrativos", "Alquiler, internet, software, oficina y gerencia.", "₲ 23.480.000 demo", "expenses"],
+      ["Personal", "Horas extra, bonos y reembolsos con valores protegidos.", "Valores protegidos", "personnel-payments"],
+    ].map(function family(item) {
+      return '<article class="panel expense-family"><span class="premium-kicker">' + esc(item[0]) + '</span><h3>' + esc(item[2]) + '</h3><p>' + esc(item[1]) + '</p><button class="button button--small button--quiet" type="button" data-route="' + esc(item[3]) + '">Ver detalle</button></article>';
+    }).join("");
+    return pageHead("Finanzas", "Control de ingresos, gastos y costos operativos.", badge("Demo Data", "warning")) + '<section class="management-metrics">' + financeMetricCards() + '</section><section class="expense-families">' + familyCards + '</section><section class="panel"><div class="panel-head"><div><h2>Centros de costo</h2><p>Estructura preparada para análisis y reportes Premium.</p></div><button class="button button--small button--quiet" type="button" data-route="reports">Ver reportes</button></div><div class="cost-center-list">' + premium.finance.costCenters.map(function center(item) { return '<span>' + esc(item) + '</span>'; }).join("") + '</div></section>';
+  }
+
+  function expenseRows() {
+    const filtered = state.expenseTab === "Todos" ? premium.expenses : premium.expenses.filter(function filterExpense(item) { return item.type === state.expenseTab; });
+    return filtered.map(function expenseRow(item) {
+      return '<tr><td>' + esc(item.date) + '</td><td><span class="cell-title">' + esc(item.category) + '</span><span class="cell-subtitle">' + esc(item.expenseId) + '</span></td><td>' + badge(item.type, item.type === "Operativo" ? "info" : item.type === "Personal" ? "warning" : "neutral") + '</td><td>' + esc(item.costCenter) + '</td><td>' + esc(item.provider) + '</td><td><strong>' + esc(item.amount) + '</strong><span class="cell-subtitle">DEMO DATA</span></td><td>' + esc(item.currency) + '</td><td>' + esc(item.responsible) + '</td><td>' + esc(item.receipt) + '</td><td>' + badge(item.approvalStatus) + '</td><td><button class="button button--small button--quiet" type="button" data-route="expense" data-id="' + esc(item.expenseId) + '">Ver</button></td></tr>';
+    }).join("");
+  }
+
+  function renderExpenses() {
+    const tabs = ["Todos", "Operativo", "Administrativo", "Personal"].map(function tab(item) {
+      return '<button class="tab' + (state.expenseTab === item ? " is-active" : "") + '" type="button" data-action="expense-tab" data-tab="' + esc(item) + '">' + esc(item === "Operativo" ? "Operativos" : item === "Administrativo" ? "Administrativos" : item) + '</button>';
+    }).join("");
+    return pageHead("Gastos", "Centro de gastos operativos, administrativos y de personal.", '<button class="button button--primary" type="button" data-action="expense-create">Registrar gasto demo</button>') + '<section class="panel"><div class="tabs">' + tabs + '</div><div class="toolbar premium-toolbar"><button class="button button--quiet" type="button" data-action="filter-demo">Fecha</button><select><option>Categoría: todas</option></select><select><option>Centro de costo: todos</option></select><select><option>Ubicación: todas</option></select><select><option>Proveedor: todos</option></select><select><option>Responsable: todos</option></select><select><option>Estado: todos</option></select></div><div class="table-wrap"><table class="data-table expense-table"><thead><tr><th>Fecha</th><th>Categoría</th><th>Tipo</th><th>Centro de costo</th><th>Proveedor</th><th>Monto</th><th>Moneda</th><th>Responsable</th><th>Comprobante</th><th>Estado</th><th>Acción</th></tr></thead><tbody>' + expenseRows() + '</tbody></table></div></section>';
+  }
+
+  function renderExpenseDetail(params) {
+    const expenseItem = premium.expenses.find(function findExpense(item) { return item.expenseId === (params.get("id") || "EXP-DEMO-001"); });
+    if (!expenseItem) return pageHead("Gasto no encontrado", "No existe ese registro demo.", routeButton("Volver", "expenses"));
+    const fields = [["Categoría", expenseItem.category], ["Monto", expenseItem.amount + " · DEMO DATA"], ["Fecha", expenseItem.date], ["Centro de costo", expenseItem.costCenter], ["Proveedor", expenseItem.provider], ["Responsable", expenseItem.responsible], ["Método de pago", expenseItem.paymentMethod], ["Comprobante", expenseItem.receipt], ["Shipment relacionado", expenseItem.shipmentId || "No aplica"], ["Notas", expenseItem.notes]];
+    return pageHead(expenseItem.expenseId, "Detalle financiero de demostración.", badge(expenseItem.approvalStatus), "Gastos / Detalle") + '<section class="detail-layout"><div class="panel"><div class="panel-head"><div><h2>Resumen</h2><p>Todos los importes son simulados.</p></div><span class="demo-label">Demo Data</span></div><div class="panel-body"><div class="summary-grid">' + fields.map(function field(item) { return '<div class="summary-item"><small>' + esc(item[0]) + '</small><strong>' + esc(item[1]) + '</strong></div>'; }).join("") + '</div></div></div><aside class="panel"><div class="panel-head"><div><h2>Aprobación</h2><p>Historial demo, sin escritura persistente.</p></div></div><div class="panel-body"><ol class="timeline"><li><time>17 Sep</time><i></i><span><strong>Registro preparado</strong><span>' + esc(expenseItem.responsible) + '</span></span></li><li><time>Hoy</time><i></i><span><strong>' + esc(expenseItem.approvalStatus) + '</strong><span>Requiere revisión humana</span></span></li></ol><div class="form-actions"><button class="button button--quiet" type="button" data-action="receipt-demo">Ver comprobante</button><button class="button button--quiet" type="button" data-action="expense-edit">Editar demo</button><button class="button button--primary" type="button" data-action="expense-approve" data-id="' + esc(expenseItem.expenseId) + '">Aprobar demo</button></div></div></aside></section>';
   }
 
   function renderReception() {
@@ -279,6 +348,114 @@
     return pageHead("Configuración", "Parámetros operativos previstos para el sistema conectado.", badge("Demo / futuro", "neutral")) + '<section class="settings-grid">' + settings + "</section>";
   }
 
+  function renderReceipts() {
+    const rows = premium.receipts.map(function receiptRow(item) {
+      return ["<strong>" + esc(item[0]) + "</strong>", '<button class="text-link" type="button" data-route="expense" data-id="' + esc(item[1]) + '">' + esc(item[1]) + "</button>", esc(item[2]), esc(item[3]), esc(item[5]), badge(item[4]), '<button class="button button--small button--quiet" type="button" data-action="receipt-demo">Ver</button>'];
+    });
+    return pageHead("Comprobantes", "Control visual de documentos asociados a gastos demo.", badge("Sin OCR · Demo", "neutral")) + '<section class="management-metrics management-metrics--four"><article class="management-metric"><span>Pendientes</span><strong>1</strong><small>Demo</small></article><article class="management-metric"><span>Adjuntos</span><strong>2</strong><small>Demo</small></article><article class="management-metric"><span>Necesitan revisión</span><strong>1</strong><small>Demo</small></article><article class="management-metric"><span>Aprobados</span><strong>1</strong><small>Demo</small></article></section><section class="panel">' + simpleTable(["Comprobante", "Gasto", "Proveedor", "Categoría", "Fecha", "Estado", "Acción"], rows) + '</section>';
+  }
+
+  function renderReports() {
+    const cards = premium.reports.map(function reportCard(item) {
+      return '<article class="panel report-card"><span class="premium-kicker">Reporte demo</span><h3>' + esc(item[0]) + '</h3><p>' + esc(item[1]) + '</p><div class="card-actions"><button class="button button--small button--quiet" type="button" data-action="report-preview" data-file="' + esc(item[2]) + '">Ver reporte</button><button class="button button--small button--primary" type="button" data-action="prepare-excel" data-file="' + esc(item[2]) + '">Preparar Excel</button></div></article>';
+    }).join("");
+    return pageHead("Reportes", "Vistas gerenciales y preparación local de entregables.", badge("Demo · XLSX no conectado", "warning")) + '<section class="report-grid">' + cards + '</section>';
+  }
+
+  function employeeRows() {
+    return premium.employees.map(function employeeRow(item) {
+      return '<tr><td><button class="text-link" type="button" data-route="employee" data-id="' + esc(item.employeeId) + '"><strong>' + esc(item.name) + '</strong></button><span class="cell-subtitle">' + esc(item.employeeId) + '</span></td><td>' + badge(item.family, item.family === "Courier" ? "info" : "warning") + '</td><td>' + esc(item.role) + '</td><td>' + esc(item.worksite) + '</td><td>' + esc(item.shift) + '</td><td>' + esc(item.entry) + ' · ' + esc(item.method) + '</td><td>' + badge(item.attendanceStatus) + '</td><td><button class="button button--small button--quiet" type="button" data-route="employee" data-id="' + esc(item.employeeId) + '">Ver</button></td></tr>';
+    }).join("");
+  }
+
+  function renderPersonnel() {
+    return pageHead("Personal", "Gestión demo de equipos Courier y Aduana.", badge("Premium", "warning")) + '<section class="management-metrics management-metrics--five"><article class="management-metric"><span>Empleados activos</span><strong>18</strong><small>Demo</small></article><article class="management-metric"><span>Presentes hoy</span><strong>17</strong><small>94%</small></article><article class="management-metric"><span>Ausentes</span><strong>1</strong><small>Demo</small></article><article class="management-metric"><span>Tardanzas</span><strong>2</strong><small>Revisar</small></article><article class="management-metric"><span>Horas extra pendientes</span><strong>6.5 h</strong><small>Demo</small></article></section><section class="family-split"><article class="panel"><span class="premium-kicker">Courier</span><h3>Recepción, Warehouse, Operación y Delivery</h3><p>Permisos operativos separados del equipo Aduana.</p></article><article class="panel"><span class="premium-kicker">Aduana / Customs</span><h3>Documentación, Revisión, Manifest y Compliance</h3><p>Permisos operativos separados del equipo Courier.</p></article></section><section class="panel"><div class="panel-head"><div><h2>Empleados demo</h2><p>Identidades ficticias para presentación.</p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Empleado</th><th>Familia</th><th>Rol</th><th>Sede</th><th>Turno</th><th>Entrada</th><th>Estado</th><th>Acción</th></tr></thead><tbody>' + employeeRows() + '</tbody></table></div></section>';
+  }
+
+  function renderEmployeeDetail(params) {
+    const employee = premium.employees.find(function findEmployee(item) { return item.employeeId === (params.get("id") || "EMP-COURIER-001"); });
+    if (!employee) return pageHead("Empleado no encontrado", "No existe ese registro demo.", routeButton("Volver", "personnel"));
+    const tabs = ["Resumen", "Asistencia", "Horario", "Horas extra", "Pagos", "Avisos", "Auditoría"].map(function employeeTab(item, index) { return '<button class="tab' + (index === 0 ? " is-active" : "") + '" type="button" data-action="employee-tab">' + esc(item) + '</button>'; }).join("");
+    return pageHead(employee.name, employee.role + " · " + employee.family, badge(employee.status, "success"), "Personal / Empleado") + '<div class="tabs employee-tabs">' + tabs + '</div><section class="detail-layout"><div class="detail-main"><article class="panel"><div class="panel-head"><div><h2>Hoy</h2><p>Registro de asistencia simulado.</p></div>' + badge(employee.attendanceStatus) + '</div><div class="panel-body"><div class="summary-grid"><div class="summary-item"><small>Turno</small><strong>' + esc(employee.shift) + '</strong></div><div class="summary-item"><small>Entrada</small><strong>' + esc(employee.entry) + '</strong></div><div class="summary-item"><small>Método</small><strong>' + esc(employee.method) + '</strong></div><div class="summary-item"><small>Esta semana</small><strong>' + esc(employee.weekHours) + '</strong></div><div class="summary-item"><small>Horas extra</small><strong>' + esc(employee.overtime) + '</strong></div><div class="summary-item"><small>Sede</small><strong>' + esc(employee.worksite) + '</strong></div></div></div></article><article class="panel app-connection"><div class="panel-head"><div><span class="premium-kicker">NexCourier Employee App</span><h2>Conexión futura</h2><p>Visualización informativa; no existe device binding real.</p></div></div><div class="panel-body"><div class="summary-grid"><div class="summary-item"><small>Device</small><strong>' + esc(employee.device) + '</strong></div><div class="summary-item"><small>Última asistencia</small><strong>' + esc(employee.entry) + ' · ' + esc(employee.method) + '</strong></div><div class="summary-item"><small>Role experience</small><strong>' + esc(employee.roleExperience) + '</strong></div><div class="summary-item"><small>App access</small><strong>' + esc(employee.appAccess) + '</strong></div></div></div></article></div><aside class="panel"><div class="panel-head"><div><h2>Control de acceso</h2><p>Concepto demo.</p></div></div><div class="panel-body"><div class="notice-box"><strong>Permisos por familia</strong><span>' + esc(employee.family) + ' mantiene permisos separados y no intercambiables.</span></div><button class="button button--quiet" type="button" data-action="protected-role-change">Cambiar rol demo</button></div></aside></section>';
+  }
+
+  function renderAttendance() {
+    const rows = premium.employees.map(function attendanceRow(item) { return ['<button class="text-link" type="button" data-route="employee" data-id="' + esc(item.employeeId) + '">' + esc(item.name) + "</button>", esc(item.family), esc(item.shift), esc(item.entry), esc(item.exit), badge(item.method, "neutral"), badge(item.attendanceStatus), '<button class="button button--small button--quiet" type="button" data-action="attendance-detail" data-id="' + esc(item.employeeId) + '">Ver evento</button>']; });
+    return pageHead("Asistencia", "Estado del turno actual con NFC y Dynamic QR simulados.", '<button class="button button--quiet" type="button" data-action="review-correction">Revisar corrección</button>') + '<section class="management-metrics management-metrics--five"><article class="management-metric"><span>Esperados hoy</span><strong>18</strong><small>Demo</small></article><article class="management-metric"><span>Presentes</span><strong>17</strong><small>Demo</small></article><article class="management-metric"><span>Ausentes</span><strong>1</strong><small>Demo</small></article><article class="management-metric"><span>Tardanzas</span><strong>2</strong><small>Demo</small></article><article class="management-metric"><span>Horas extra</span><strong>6.5 h</strong><small>Demo</small></article></section><section class="notice-box"><strong>Simulación segura</strong><span>Empleado autenticado + dispositivo registrado + geofence + NFC seguro o QR dinámico + timestamp del servidor. No usa GPS, NFC ni QR reales.</span></section><section class="panel"><div class="panel-head"><div><h2>Turno actual</h2><p>Registros determinísticos de demostración.</p></div></div>' + simpleTable(["Empleado", "Tipo", "Turno", "Entrada", "Salida", "Método", "Estado", "Acción"], rows) + '</section>';
+  }
+
+  function renderSchedules() {
+    const rows = premium.employees.map(function scheduleRow(item) { return [esc(item.name), esc(item.role), esc(item.shift), esc(item.shift), esc(item.shift), esc(item.shift), esc(item.shift), item.family === "Courier" ? "08:00–13:00" : "—", '<button class="button button--small button--quiet" type="button" data-action="edit-schedule" data-id="' + esc(item.employeeId) + '">Editar</button>']; });
+    return pageHead("Horarios", "Planificación semanal local para la demostración.", badge("Sesión local", "neutral")) + '<section class="panel">' + simpleTable(["Empleado", "Rol", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Acción"], rows) + '</section>';
+  }
+
+  function renderOvertime() {
+    const rows = premium.overtime.map(function overtimeRow(item) { return [esc(item[0]), esc(item[1]), esc(item[2]), esc(item[3]), "<strong>" + esc(item[4]) + "</strong>", esc(item[5]), badge(item[6]), '<div class="table-actions"><button class="button button--small button--quiet" type="button" data-action="overtime-review">Revisar</button><button class="button button--small button--primary" type="button" data-action="overtime-approve">Aprobar demo</button><button class="button button--small button--danger" type="button" data-action="overtime-reject">Rechazar demo</button></div>']; });
+    return pageHead("Horas extra", "Revisión gerencial sin cálculo de nómina.", badge("6.5 h · Demo", "warning")) + '<section class="panel">' + simpleTable(["Empleado", "Fecha", "Programado", "Trabajado", "Horas extra", "Motivo", "Estado", "Acciones"], rows) + '</section>';
+  }
+
+  function renderPersonnelPayments() {
+    const rows = premium.payments.map(function paymentRow(item) { return [esc(item[0]), esc(item[1]), esc(item[2]), esc(item[3]), esc(item[4]), esc(item[5]), badge(item[6]), '<button class="button button--small button--quiet" type="button" data-action="personnel-payment-review">Revisar</button>']; });
+    return pageHead("Pagos personal", "Vista de gestión con importes protegidos.", badge("Sin nómina real", "neutral")) + '<section class="notice-box notice-box--warning"><strong>Datos protegidos</strong><span>No se muestran salarios reales ni se realizan cálculos de payroll.</span></section><section class="panel">' + simpleTable(["Empleado", "Período", "Horas", "Horas extra", "Bono demo", "Deducción demo", "Estado", "Acción"], rows) + '</section>';
+  }
+
+  function normalizeText(value) {
+    return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function aiAnswer(prompt, channel) {
+    const query = normalizeText(prompt);
+    if (/cambia|cambiar|modifica|entrada.*07:58|asistencia.*empleado/.test(query)) {
+      return '<div class="ai-safety"><span class="premium-kicker">Acción protegida</span><h3>Este registro no puede cambiarse automáticamente.</h3><p>Puedo preparar una solicitud de corrección para aprobación gerencial.</p><div class="confirm-summary"><div><small>Empleado</small><strong>Operador Courier Demo</strong></div><div><small>Actual</small><strong>08:17</strong></div><div><small>Solicitado</small><strong>07:58</strong></div><div><small>Requiere</small><strong>Aprobación gerencial</strong></div></div><button class="button button--primary" type="button" data-action="prepare-correction">Preparar corrección</button></div>';
+    }
+    if (/excel.*asistencia|asistencia.*excel/.test(query)) {
+      return workbookResult("NexCourier_Asistencia_Septiembre.xlsx", ["Resumen", "Courier", "Aduana", "Horas extra", "Tardanzas", "Ausencias"], "18 empleados demo · registros de asistencia · septiembre 2026");
+    }
+    if (/excel|reporte.*septiembre/.test(query) && /gasto|septiembre/.test(query)) {
+      return workbookResult("NexCourier_Gastos_Septiembre.xlsx", ["Resumen", "Aeropuerto", "Administración", "Personal", "Proveedores", "Gráficos"], "12 gastos demo · septiembre 2026 · 6 centros de costo");
+    }
+    if (/reporte mensual|gerencia/.test(query)) {
+      return '<div class="ai-result"><span class="premium-kicker">Reporte mensual de gerencia</span><h3>Resumen preparado</h3><div class="result-sections"><section><strong>Operación</strong><p>82 recibidos hoy · 4 no identificados · 7 documentos pendientes.</p></section><section><strong>Finanzas</strong><p>Gastos operativos, administrativos y de personal identificados como DEMO DATA.</p></section><section><strong>Personal</strong><p>18 empleados · 17 presentes · 2 tardanzas · 6.5 h extra demo.</p></section></div><div class="notice-box notice-box--warning"><strong>Recomendación</strong><span>Revisar costos de aeropuerto y tendencia de horas extra.</span></div><div class="card-actions"><button class="button button--quiet" type="button" data-route="reports">Ver reporte</button><button class="button button--primary" type="button" data-action="prepare-excel" data-file="NexCourier_Gerencia_Septiembre.xlsx">Preparar Excel</button></div></div>';
+    }
+    if (/categoria.*subio|gastos crecieron/.test(query)) return '<div class="ai-result"><h3>Software muestra el mayor crecimiento demo</h3><p>Variación simulada de +18% frente a agosto.</p><div class="evidence-box"><strong>Evidencia</strong><span>Categoría: Software</span><span>2 registros demo · Sep 2026</span></div><button class="button button--quiet" type="button" data-route="expenses">Ver gastos</button></div>';
+    if (/administracion/.test(query)) return '<div class="ai-result"><h3>Administración · DEMO ₲ 23.480.000</h3><p>Alquiler, internet, software, oficina y gerencia componen el total simulado.</p><div class="evidence-box"><strong>Evidencia</strong><span>Cost Center: Administración + Gerencia</span><span>4 registros demo · Sep 2026</span></div><button class="button button--quiet" type="button" data-route="expenses">Ver movimientos</button></div>';
+    if (/gasto.*personal|personal.*gasto/.test(query)) return '<div class="ai-result"><h3>Gastos de personal · valores protegidos</h3><p>2 registros demo: horas extra y reembolso. No se muestran salarios ni cálculos de nómina.</p><div class="evidence-box"><strong>Evidencia</strong><span>Cost Center: Operación Paraguay</span><span>Importes enmascarados</span></div><button class="button button--quiet" type="button" data-route="personnel-payments">Ver gestión</button></div>';
+    if (/pendiente.*aprobacion|gastos pendientes/.test(query)) return '<div class="ai-result"><h3>4 gastos requieren aprobación o revisión</h3><p>EXP-DEMO-001, EXP-DEMO-005, EXP-DEMO-010 y EXP-DEMO-011.</p><div class="evidence-box"><strong>Evidencia</strong><span>Estado: Pendiente</span><span>Datos demo · Sep 2026</span></div><button class="button button--quiet" type="button" data-route="expenses">Ver pendientes</button></div>';
+    if (/analiza.*gasto|gastos.*septiembre/.test(query)) return '<div class="ai-result"><h3>Análisis de gastos · Septiembre</h3><p>Operación concentra el mayor volumen demo; aeropuerto y carga aérea son los principales impulsores. Administración permanece estable y personal está protegido.</p><div class="evidence-box"><strong>Evidencia</strong><span>12 gastos demo</span><span>6 centros de costo</span><span>PYG + USD, sin conversión contable real</span></div><button class="button button--quiet" type="button" data-route="finance">Ver finanzas</button></div>';
+    if (/compara|agosto.*septiembre/.test(query)) return '<div class="ai-result"><h3>Septiembre sube 8,4% demo vs. agosto</h3><p>La variación se concentra en aeropuerto, software y horas extra.</p><div class="evidence-box"><strong>Evidencia</strong><span>Comparativo mensual simulado</span><span>Sin contabilidad real</span></div><button class="button button--quiet" type="button" data-route="reports">Ver comparativo</button></div>';
+    if (/aeropuerto/.test(query)) {
+      return '<div class="ai-result"><span class="premium-kicker">Gastos aeropuerto · Septiembre</span><h3>DEMO ₲ 35.450.000</h3><div class="breakdown-list"><span><b>Handling</b><strong>42%</strong></span><span><b>Transporte</b><strong>21%</strong></span><span><b>Documentación</b><strong>18%</strong></span><span><b>Otros</b><strong>19%</strong></span></div><div class="evidence-box"><strong>Evidencia</strong><span>Cost Center: Aeropuerto</span><span>Período: Sep 2026</span><span>12 demo expense records</span></div><div class="card-actions"><button class="button button--quiet" type="button" data-route="expenses">Ver movimientos</button><button class="button button--primary" type="button" data-action="prepare-excel" data-file="NexCourier_Aeropuerto_Septiembre.xlsx">Preparar Excel</button></div></div>';
+    }
+    if (/tarde|tardanza/.test(query)) return '<div class="ai-result"><h3>2 tardanzas hoy</h3><p>Supervisor Aduana Demo registró 08:12. Otro registro demo está agregado al total gerencial.</p><div class="evidence-box"><strong>Evidencia</strong><span>Asistencia · 18 empleados demo</span><span>Turno base · 08:00–17:00</span></div><button class="button button--quiet" type="button" data-route="attendance">Ver asistencia</button></div>';
+    if (/resumi.*asistencia|asistencia de hoy/.test(query)) return '<div class="ai-result"><h3>Asistencia de hoy</h3><p>17 presentes · 1 ausente · 2 tardanzas · 6.5 h extra demo.</p><div class="evidence-box"><strong>Evidencia</strong><span>18 empleados demo esperados</span><span>NFC y Dynamic QR simulados</span></div><button class="button button--quiet" type="button" data-route="attendance">Ver asistencia</button></div>';
+    if (/cuantas horas trabajo|horas trabajo operador courier/.test(query)) return '<div class="ai-result"><h3>Operador Courier Demo · 39h 22m</h3><p>Total semanal simulado. Incluye 2h 10m extra pendientes.</p><div class="evidence-box"><strong>Evidencia</strong><span>EMP-COURIER-001</span><span>Semana demo actual</span></div><button class="button button--quiet" type="button" data-route="employee" data-id="EMP-COURIER-001">Ver empleado</button></div>';
+    if (/revisa.*asistencia|asistencia.*semana/.test(query)) return '<div class="ai-result"><h3>Asistencia semanal revisada</h3><p>Courier concentra 5h 30m extra demo; Aduana registra 1 tardanza visible y 1 adicional agregada.</p><div class="evidence-box"><strong>Evidencia</strong><span>18 empleados demo</span><span>Semana actual</span></div><button class="button button--quiet" type="button" data-route="attendance">Ver asistencia</button></div>';
+    if (/empleados.*hora.*extra|mas horas extra/.test(query)) return '<div class="ai-result"><h3>Supervisor Courier Demo lidera horas extra</h3><p>3h 20m demo, seguido de Operador Courier Demo con 2h 10m.</p><div class="evidence-box"><strong>Evidencia</strong><span>3 registros demo</span><span>Sin cálculo de nómina</span></div><button class="button button--quiet" type="button" data-route="overtime">Ver detalle</button></div>';
+    if (/ausente/.test(query)) return '<div class="ai-result"><h3>1 ausencia demo</h3><p>La identidad permanece omitida en esta presentación.</p><div class="evidence-box"><strong>Evidencia</strong><span>17 de 18 presentes</span><span>Período: hoy</span></div></div>';
+    if (/hora.*extra|cuantas horas/.test(query)) return '<div class="ai-result"><h3>6.5 h extra pendientes</h3><p>Courier concentra la mayor parte de las horas pendientes de aprobación.</p><div class="evidence-box"><strong>Evidencia</strong><span>3 registros demo</span><span>Sin cálculo de nómina</span></div><button class="button button--quiet" type="button" data-route="overtime">Ver horas extra</button></div>';
+    if (/018401|que falta/.test(query)) return '<div class="ai-result"><h3>NXP-26-018401 requiere atención</h3><p>Falta la factura de compra antes de continuar.</p><div class="evidence-box"><strong>Evidencia</strong><span>Estado: DOCUMENT_REQUIRED</span><span>Cliente: NXC-10482</span></div><button class="button button--quiet" type="button" data-route="package" data-id="NXP-26-018401">Ver paquete</button></div>';
+    if (/018392|busca/.test(query)) return '<div class="ai-result"><h3>NXP-26-018392 localizado</h3><p>Amazon · 1.24 kg · recibido en Centro internacional — Demo.</p><div class="evidence-box"><strong>Evidencia</strong><span>Ubicación A-18</span><span>Cliente NXC-10482</span></div><button class="button button--quiet" type="button" data-route="package" data-id="NXP-26-018392">Ver paquete</button></div>';
+    if (/shipment|listo/.test(query)) return '<div class="ai-result"><h3>Shipment 94.6% preparado</h3><p>174 paquetes listos y 10 casos requieren revisión.</p><div class="evidence-box"><strong>Evidencia</strong><span>NXS-MIA-ASU-260918-A</span><span>Salida demo 21:30</span></div><button class="button button--quiet" type="button" data-route="shipment" data-id="NXS-MIA-ASU-260918-A">Revisar shipment</button></div>';
+    if (/operacion|atencion|miami/.test(query)) return '<div class="ai-result"><h3>3 áreas requieren atención</h3><p>Shipment: 10 revisiones · No identificados: 4 · Documentos: 7.</p><div class="evidence-box"><strong>Evidencia</strong><span>Dashboard operativo actual</span><span>Datos determinísticos demo</span></div></div>';
+    return '<div class="ai-result"><h3>Resumen contextual preparado</h3><p>La consulta se procesó localmente sobre ' + esc(channel) + '. Probá con gastos de aeropuerto, asistencia, shipment o un reporte mensual.</p><div class="evidence-box"><strong>Contexto</strong><span>Sin llamadas a IA externa</span><span>Demo determinística</span></div></div>';
+  }
+
+  function workbookResult(file, sheets, evidence) {
+    return '<div class="workbook-result"><span class="premium-kicker">Reporte preparado</span><h3>' + esc(file) + '</h3><ol>' + sheets.map(function sheet(item, index) { return '<li><b>' + (index + 1) + '</b><span>' + esc(item) + '</span></li>'; }).join("") + '</ol><div class="evidence-box"><strong>Evidencia</strong><span>' + esc(evidence) + '</span></div><p class="demo-disclaimer">Demo — XLSX generation not connected yet.</p><div class="card-actions"><button class="button button--quiet" type="button" data-action="report-preview" data-file="' + esc(file) + '">Ver preview</button><button class="button button--primary" type="button" data-action="simulate-download">Simular descarga</button></div></div>';
+  }
+
+  function renderAiQuick(route) {
+    if (!aiQuickPanel || !isPremium()) return;
+    const context = { mode: "premium", page: route.page, module: /finance|expense|receipt|report/.test(route.page) ? "finance" : /person|attendance|schedule|overtime/.test(route.page) ? "personnel" : "operations", resourceType: route.page === "expense" ? "expense" : route.page === "employee" ? "employee" : route.page, resourceId: route.params.get("id") || null, selectedRecords: [], filters: {}, role: "admin", locale: "es" };
+    aiQuickPanel.innerHTML = '<header><div><span class="premium-kicker">✦ AI Quick</span><h2>Asistencia contextual</h2></div><button class="icon-btn" type="button" data-action="toggle-ai-quick" aria-label="Cerrar">' + icon("x") + '</button></header><div class="ai-context"><strong>Contexto activo</strong><span>' + esc(context.module) + ' · ' + esc(context.page) + (context.resourceId ? " · " + esc(context.resourceId) : "") + '</span></div><div class="prompt-chips"><button type="button" data-action="ai-suggestion">¿Qué requiere atención hoy?</button><button type="button" data-action="ai-suggestion">¿Cuánto gastamos en aeropuerto este mes?</button><button type="button" data-action="ai-suggestion">¿Quién llegó tarde hoy?</button></div><div class="ai-quick-answer">' + (state.aiQuickAnswer || '<div class="ai-empty"><strong>Preguntá sobre esta pantalla</strong><span>Las respuestas usan datos demo y muestran evidencia.</span></div>') + '</div><form id="aiQuickForm"><label class="sr-only" for="aiQuickInput">Pregunta</label><textarea id="aiQuickInput" name="prompt" placeholder="Escribí una pregunta..." required>' + esc(state.aiQuickPrompt) + '</textarea><button class="button button--primary" type="submit">Consultar</button></form>';
+    aiQuickPanel.hidden = !state.aiQuickOpen;
+  }
+
+  function renderAiCoworker() {
+    const answer = state.coworkerAnswer || '<div class="coworker-welcome"><span class="premium-kicker">Workspace de gestión</span><h2>Un plan visible antes de cada resultado</h2><p>Elegí una tarea o escribí una instrucción. Nada sensible se ejecuta sin confirmación humana.</p></div>';
+    return pageHead("AI Coworker", "Workspace determinístico para análisis, evidencia y acciones preparadas.", badge("Premium · Demo local", "warning")) + '<section class="coworker-layout"><aside class="panel coworker-conversation"><div class="panel-head"><div><h2>Conversación</h2><p>Instrucciones de gestión.</p></div></div><div class="prompt-chips prompt-chips--stack"><button type="button" data-action="coworker-suggestion">Revisá la operación de hoy.</button><button type="button" data-action="coworker-suggestion">Analizá los gastos de septiembre.</button><button type="button" data-action="coworker-suggestion">Preparame el reporte mensual de gerencia.</button><button type="button" data-action="coworker-suggestion">Preparame el Excel de asistencia.</button><button type="button" data-action="coworker-suggestion">Cambiale la asistencia al empleado.</button></div><form id="coworkerForm"><textarea name="prompt" placeholder="Asigná una tarea..." required>' + esc(state.coworkerPrompt) + '</textarea><button class="button button--primary" type="submit">Preparar plan</button></form></aside><main class="panel coworker-results"><div class="panel-head"><div><h2>Plan / Resultados</h2><p>Pasos, hallazgos y entregables.</p></div></div><div class="coworker-output">' + answer + '</div></main><aside class="panel coworker-evidence"><div class="panel-head"><div><h2>Evidencia</h2><p>Fuentes y límites.</p></div></div><div class="panel-body"><div class="document-row"><span><strong>Operación</strong><small>Registros canónicos demo</small></span>' + badge("Local", "success") + '</div><div class="document-row"><span><strong>Finanzas</strong><small>12 gastos simulados</small></span>' + badge("Demo", "warning") + '</div><div class="document-row"><span><strong>Personal</strong><small>Identidades ficticias</small></span>' + badge("Demo", "warning") + '</div><div class="notice-box"><strong>Sin red</strong><span>No hay LLM, RAG, embeddings ni llamadas externas.</span></div></div></aside></section>';
+  }
+
   const renderers = {
     dashboard: renderDashboard,
     reception: renderReception,
@@ -299,12 +476,25 @@
     team: renderTeam,
     audit: renderAudit,
     settings: renderSettings,
+    finance: renderFinance,
+    expenses: renderExpenses,
+    expense: renderExpenseDetail,
+    receipts: renderReceipts,
+    reports: renderReports,
+    personnel: renderPersonnel,
+    employee: renderEmployeeDetail,
+    attendance: renderAttendance,
+    schedules: renderSchedules,
+    overtime: renderOvertime,
+    "personnel-payments": renderPersonnelPayments,
+    "ai-coworker": renderAiCoworker,
   };
 
   function currentRoute() {
     const params = new URLSearchParams(global.location.search);
     const requestedPage = params.get("page");
-    const page = requestedPage === "configuration" ? "settings" : renderers[requestedPage] ? requestedPage : "dashboard";
+    let page = requestedPage === "configuration" ? "settings" : renderers[requestedPage] ? requestedPage : "dashboard";
+    if (!isPremium() && premiumPages.includes(page)) page = "dashboard";
     return { page: page, params: params };
   }
 
@@ -319,9 +509,23 @@
 
   function renderCurrent() {
     const route = currentRoute();
+    document.body.dataset.mode = activeMode();
+    document.querySelectorAll("[data-premium-only]").forEach(function togglePremium(element) {
+      element.hidden = !isPremium();
+    });
+    document.querySelectorAll('[data-action="set-mode"]').forEach(function toggleMode(button) {
+      button.classList.toggle("is-active", button.dataset.mode === activeMode());
+      button.setAttribute("aria-pressed", String(button.dataset.mode === activeMode()));
+    });
+    const productChip = document.querySelector("#productChip");
+    if (productChip) {
+      productChip.textContent = isPremium() ? "Premium" : "Standard";
+      productChip.classList.toggle("is-premium", isPremium());
+    }
     view.innerHTML = renderers[route.page](route.params);
     updateNavigation(route.page);
-    document.title = titles[route.page] + " — NexCourier Admin Demo";
+    document.title = titles[route.page] + " — NexCourier Admin " + (isPremium() ? "Premium" : "Standard") + " Demo";
+    renderAiQuick(route);
     view.focus({ preventScroll: true });
     global.scrollTo(0, 0);
   }
@@ -450,12 +654,69 @@
       event.preventDefault();
       const body = '<div class="confirm-summary"><div><small>Paquete</small><strong>NXP-26-018392</strong></div><div><small>Cliente</small><strong>NXC-10482</strong></div><div><small>Peso</small><strong>1.24 kg</strong></div><div><small>Ubicación</small><strong>A-18</strong></div></div><div class="notice-box"><strong>Acción de demostración</strong><span>No existe una escritura a backend.</span></div>';
       showModal("Confirmar recepción", "Revisá los datos antes de continuar.", body, '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--primary" type="button" data-action="confirm-reception">Confirmar demo</button>');
+    } else if (event.target.id === "aiQuickForm") {
+      event.preventDefault();
+      state.aiQuickPrompt = new FormData(event.target).get("prompt").trim();
+      state.aiQuickAnswer = aiAnswer(state.aiQuickPrompt, "AI Quick");
+      renderAiQuick(currentRoute());
+    } else if (event.target.id === "coworkerForm") {
+      event.preventDefault();
+      state.coworkerPrompt = new FormData(event.target).get("prompt").trim();
+      state.coworkerAnswer = '<div class="coworker-plan"><span class="premium-kicker">Plan preparado</span><ol><li>Revisar contexto y período</li><li>Consultar registros demo</li><li>Agrupar hallazgos</li><li>Mostrar evidencia</li><li>Preparar acciones para confirmación</li></ol></div>' + aiAnswer(state.coworkerPrompt, "AI Coworker");
+      renderCurrent();
     }
   }
 
   function handleAction(action, element) {
     if (action === "open-sidebar") document.body.classList.add("sidebar-open");
-    else if (action === "close-sidebar") document.body.classList.remove("sidebar-open");
+    else if (action === "set-mode") {
+      const params = new URLSearchParams(global.location.search);
+      const nextMode = element.dataset.mode === "premium" ? "premium" : "standard";
+      params.set("mode", nextMode);
+      if (nextMode === "standard" && premiumPages.includes(params.get("page"))) params.set("page", "dashboard");
+      global.history.pushState({}, "", "?" + params.toString());
+      state.aiQuickOpen = false;
+      renderCurrent();
+    } else if (action === "toggle-ai-quick") {
+      state.aiQuickOpen = !state.aiQuickOpen;
+      renderAiQuick(currentRoute());
+    } else if (action === "ai-suggestion") {
+      state.aiQuickPrompt = element.textContent.trim();
+      state.aiQuickAnswer = aiAnswer(state.aiQuickPrompt, "AI Quick");
+      state.aiQuickOpen = true;
+      renderAiQuick(currentRoute());
+    } else if (action === "coworker-suggestion") {
+      state.coworkerPrompt = element.textContent.trim();
+      state.coworkerAnswer = '<div class="coworker-plan"><span class="premium-kicker">Plan preparado</span><ol><li>Revisar contexto y período</li><li>Consultar registros demo</li><li>Agrupar hallazgos</li><li>Mostrar evidencia</li><li>Preparar acciones para confirmación</li></ol></div>' + aiAnswer(state.coworkerPrompt, "AI Coworker");
+      renderCurrent();
+    } else if (action === "expense-tab") {
+      state.expenseTab = element.dataset.tab;
+      renderCurrent();
+    } else if (action === "prepare-excel") {
+      const file = element.dataset.file || "NexCourier_Gastos_Septiembre.xlsx";
+      const body = '<div class="report-progress"><p>✓ Recopilando gastos</p><p>✓ Agrupando categorías</p><p>✓ Calculando subtotales</p><p>✓ Preparando gráficos</p><p>✓ Generando estructura</p></div>' + workbookResult(file, file.indexOf("Asistencia") >= 0 ? ["Resumen", "Courier", "Aduana", "Horas extra", "Tardanzas", "Ausencias"] : ["Resumen", "Aeropuerto", "Administración", "Personal", "Proveedores", "Gráficos"], "Datos determinísticos de esta demostración");
+      showModal("Reporte preparado", "Preparación local finalizada.", body, '<button class="button button--quiet" type="button" data-action="close-modal">Cerrar</button><button class="button button--primary" type="button" data-action="simulate-download">Simular descarga</button>');
+    } else if (action === "report-preview") {
+      showModal("Preview del reporte", element.dataset.file || "Reporte demo", '<div class="workbook-preview"><div><strong>Resumen</strong><span>Totales y variación demo</span></div><div><strong>Detalle</strong><span>Registros y categorías</span></div><div><strong>Gráficos</strong><span>Estructura visual preparada</span></div></div><div class="notice-box"><strong>Demo</strong><span>No se generó un archivo XLSX real.</span></div>', '<button class="button button--primary" type="button" data-action="close-modal">Entendido</button>');
+    } else if (action === "simulate-download") {
+      closeModal();
+      showToast("Descarga simulada", "No se generó ni descargó un XLSX real.");
+    } else if (action === "expense-approve") {
+      showModal("Confirmar aprobación demo", "Esta acción financiera requiere confirmación humana.", '<div class="confirm-summary"><div><small>Registro</small><strong>' + esc(element.dataset.id) + '</strong></div><div><small>Alcance</small><strong>Sesión local</strong></div></div><div class="notice-box notice-box--warning"><strong>Acción sensible</strong><span>No se modificará información financiera real.</span></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--primary" type="button" data-action="confirm-sensitive-demo">Confirmar demo</button>');
+    } else if (action === "review-correction" || action === "prepare-correction") {
+      const correction = premium.correction;
+      showModal("Solicitud de corrección", "Requiere aprobación de un responsable.", '<div class="confirm-summary"><div><small>Empleado</small><strong>' + esc(correction.employee) + '</strong></div><div><small>Actual</small><strong>' + esc(correction.current) + '</strong></div><div><small>Solicitado</small><strong>' + esc(correction.requested) + '</strong></div><div><small>Motivo</small><strong>' + esc(correction.reason) + '</strong></div></div><div class="notice-box notice-box--warning"><strong>No aplicado</strong><span>La corrección permanece pendiente hasta la confirmación.</span></div>', '<button class="button button--danger" type="button" data-action="reject-correction">Rechazar demo</button><button class="button button--primary" type="button" data-action="approve-correction">Aprobar demo</button>');
+    } else if (action === "approve-correction" || action === "reject-correction" || action === "confirm-sensitive-demo") {
+      closeModal();
+      showToast("Resultado registrado en auditoría demo", "Acción simulada para esta sesión; no hubo escritura persistente.");
+    } else if (action === "attendance-detail") {
+      const employee = premium.employees.find(function findAttendance(item) { return item.employeeId === element.dataset.id; }) || premium.employees[0];
+      showModal("Evento de entrada", "Registro de asistencia simulado.", '<div class="confirm-summary"><div><small>Empleado</small><strong>' + esc(employee.name) + '</strong></div><div><small>Hora</small><strong>' + esc(employee.entry) + '</strong></div><div><small>Método</small><strong>' + esc(employee.method) + '</strong></div><div><small>Device</small><strong>Registered demo device</strong></div><div><small>Location</small><strong>Authorized demo location</strong></div><div><small>Verification</small><strong>Passed</strong></div></div><div class="notice-box"><strong>Sin hardware real</strong><span>No se recopiló GPS ni información de dispositivo.</span></div>', '<button class="button button--primary" type="button" data-action="close-modal">Cerrar</button>');
+    } else if (action === "edit-schedule") {
+      showModal("Editar horario", "Los cambios viven solo en esta sesión demo.", '<div class="form-grid"><label class="field"><span>Entrada</span><input value="08:00"></label><label class="field"><span>Salida</span><input value="17:00"></label></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--primary" type="button" data-action="confirm-sensitive-demo">Guardar demo</button>');
+    } else if (action === "protected-role-change") {
+      showModal("Cambio de rol protegido", "AI no puede cambiar permisos automáticamente.", '<div class="notice-box notice-box--warning"><strong>Requiere administrador autorizado</strong><span>Se puede preparar la solicitud, pero el cambio no se ejecuta en esta demo.</span></div>', '<button class="button button--primary" type="button" data-action="close-modal">Entendido</button>');
+    } else if (action === "close-sidebar") document.body.classList.remove("sidebar-open");
     else if (action === "collapse-sidebar") {
       state.sidebarCollapsed = !state.sidebarCollapsed;
       sidebar.classList.toggle("is-collapsed", state.sidebarCollapsed);
@@ -494,7 +755,7 @@
     else if (action === "review-match") showModal("Revisar coincidencia", "La asignación requiere confirmación humana.", '<div class="confirm-summary"><div><small>Caso</small><strong>' + esc(element.dataset.case) + '</strong></div><div><small>Posible cliente</small><strong>NXC-10482</strong></div><div><small>Evidencia</small><strong>Código parcial · nombre similar</strong></div></div><div class="notice-box notice-box--warning"><strong>No asignado</strong><span>La demostración conserva el paquete en la cola hasta confirmar.</span></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--navy" type="button" data-action="confirm-match-demo">Confirmar demo</button>');
     else if (action === "confirm-match-demo") { closeModal(); showToast("Coincidencia revisada", "Confirmación simulada; la fuente canónica no fue modificada."); }
     else if (action === "demo-soon") showToast(element.dataset.label || "Función demo", "Próximamente en el sistema conectado.");
-    else if (["assign-shipment", "customer-search-demo", "create-case", "support-note", "delivery-demo", "warehouse-lookup", "support-demo", "payment-demo", "billing-demo", "team-demo", "audit-filter", "settings-demo"].includes(action)) showToast("Acción de demostración", "Interacción preparada como shell; no realiza cambios externos.");
+    else if (["assign-shipment", "customer-search-demo", "create-case", "support-note", "delivery-demo", "warehouse-lookup", "support-demo", "payment-demo", "billing-demo", "team-demo", "audit-filter", "settings-demo", "expense-create", "expense-edit", "receipt-demo", "employee-tab", "overtime-review", "overtime-approve", "overtime-reject", "personnel-payment-review"].includes(action)) showToast("Acción de demostración", "Interacción preparada como shell; no realiza cambios externos.");
   }
 
   document.addEventListener("click", function clickHandler(event) {
