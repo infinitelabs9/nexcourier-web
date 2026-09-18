@@ -25,6 +25,9 @@
     shipmentDeparted: false,
     sidebarCollapsed: false,
     expenseTab: "Todos",
+    expenses: [],
+    expenseEditor: null,
+    pendingExpense: null,
     aiQuickOpen: false,
     coworkerPrompt: "",
     aiQuickPrompt: "",
@@ -32,6 +35,29 @@
     coworkerAnswer: "",
     toastTimer: null,
   };
+
+  function parseExpenseAmount(value) {
+    const normalized = String(value || "").replace(/[^0-9]/g, "");
+    return Number(normalized || 0);
+  }
+
+  function cloneExpense(item) {
+    const copy = JSON.parse(JSON.stringify(item));
+    copy.entryMode = copy.entryMode || "simple";
+    copy.amountValue = Number.isFinite(copy.amountValue) ? copy.amountValue : parseExpenseAmount(copy.amount);
+    copy.description = copy.description || copy.notes || "Gasto registrado para esta demostración.";
+    copy.lines = (copy.lines || []).map(function cloneLine(line, index) {
+      const quantity = Math.max(0, Number(line.quantity) || 0);
+      const unitPrice = Math.max(0, Number(line.unitPrice) || 0);
+      return { id: line.id || "LINE-" + (index + 1), description: line.description || "", quantity: quantity, unitPrice: unitPrice, subtotal: quantity * unitPrice };
+    });
+    copy.relationship = copy.relationship || (copy.shipmentId ? { type: "Shipment", resourceId: copy.shipmentId, label: "Miami → Asunción" } : copy.employeeId ? { type: "Empleado", resourceId: copy.employeeId, label: copy.employeeId === "EMP-COURIER-001" ? "Operador Courier Demo" : "Operador Aduana Demo" } : { type: "Ninguno", resourceId: "", label: "" });
+    copy.receiptDocument = copy.receiptDocument || null;
+    copy.history = copy.history || [{ date: copy.date + " · 10:00", title: "Gasto creado", detail: copy.responsible + " · Demo" }];
+    return copy;
+  }
+
+  state.expenses = premium.expenses.map(cloneExpense);
 
   const titles = {
     dashboard: "Dashboard", reception: "Recepción", packages: "Paquetes",
@@ -152,10 +178,36 @@
     return pageHead("Finanzas", "Control de ingresos, gastos y costos operativos.", badge("Demo Data", "warning")) + '<section class="management-metrics">' + financeMetricCards() + '</section><section class="expense-families">' + familyCards + '</section><section class="panel"><div class="panel-head"><div><h2>Centros de costo</h2><p>Estructura preparada para análisis y reportes Premium.</p></div><button class="button button--small button--quiet" type="button" data-route="reports">Ver reportes</button></div><div class="cost-center-list">' + premium.finance.costCenters.map(function center(item) { return '<span>' + esc(item) + '</span>'; }).join("") + '</div></section>';
   }
 
+  function formatExpenseMoney(value, currency) {
+    const amount = Math.max(0, Number(value) || 0);
+    const formatted = new Intl.NumberFormat("es-PY", { maximumFractionDigits: 0 }).format(amount);
+    return currency === "USD" ? "USD " + formatted : "₲ " + formatted;
+  }
+
+  function expenseDisplayAmount(item) {
+    return /protegido/i.test(item.amount || "") && !item.amountValue ? item.amount : formatExpenseMoney(expenseTotal(item), item.currency);
+  }
+
+  function expenseTotal(item) {
+    if (item.entryMode === "itemized") return item.lines.reduce(function sum(total, line) { return total + (Math.max(0, Number(line.quantity) || 0) * Math.max(0, Number(line.unitPrice) || 0)); }, 0);
+    return Math.max(0, Number(item.amountValue) || 0);
+  }
+
+  function syncExpenseAmount(item) {
+    item.lines.forEach(function syncLine(line) { line.subtotal = Math.max(0, Number(line.quantity) || 0) * Math.max(0, Number(line.unitPrice) || 0); });
+    item.amountValue = expenseTotal(item);
+    item.amount = formatExpenseMoney(item.amountValue, item.currency);
+    return item;
+  }
+
+  function findExpense(expenseId) {
+    return state.expenses.find(function matchExpense(item) { return item.expenseId === expenseId; });
+  }
+
   function expenseRows() {
-    const filtered = state.expenseTab === "Todos" ? premium.expenses : premium.expenses.filter(function filterExpense(item) { return item.type === state.expenseTab; });
+    const filtered = state.expenseTab === "Todos" ? state.expenses : state.expenses.filter(function filterExpense(item) { return item.type === state.expenseTab; });
     return filtered.map(function expenseRow(item) {
-      return '<tr><td>' + esc(item.date) + '</td><td><span class="cell-title">' + esc(item.category) + '</span><span class="cell-subtitle">' + esc(item.expenseId) + '</span></td><td>' + badge(item.type, item.type === "Operativo" ? "info" : item.type === "Personal" ? "warning" : "neutral") + '</td><td>' + esc(item.costCenter) + '</td><td>' + esc(item.provider) + '</td><td><strong>' + esc(item.amount) + '</strong><span class="cell-subtitle">DEMO DATA</span></td><td>' + esc(item.currency) + '</td><td>' + esc(item.responsible) + '</td><td>' + esc(item.receipt) + '</td><td>' + badge(item.approvalStatus) + '</td><td><button class="button button--small button--quiet" type="button" data-route="expense" data-id="' + esc(item.expenseId) + '">Ver</button></td></tr>';
+      return '<tr><td>' + esc(item.date) + '</td><td><span class="cell-title">' + esc(item.category) + '</span><span class="cell-subtitle">' + esc(item.expenseId) + '</span></td><td>' + badge(item.type, item.type === "Operativo" ? "info" : item.type === "Personal" ? "warning" : "neutral") + '</td><td>' + esc(item.costCenter) + '</td><td>' + esc(item.provider) + '</td><td><strong>' + esc(expenseDisplayAmount(item)) + '</strong><span class="cell-subtitle">' + esc(item.entryMode === "itemized" ? item.lines.length + " conceptos" : "Gasto simple") + '</span></td><td>' + esc(item.currency) + '</td><td>' + esc(item.responsible) + '</td><td>' + esc(item.receiptDocument ? "Adjunto demo" : item.receipt) + '</td><td>' + badge(item.approvalStatus) + '</td><td><button class="button button--small button--quiet" type="button" data-route="expense" data-id="' + esc(item.expenseId) + '">Ver</button></td></tr>';
     }).join("");
   }
 
@@ -163,14 +215,170 @@
     const tabs = ["Todos", "Operativo", "Administrativo", "Personal"].map(function tab(item) {
       return '<button class="tab' + (state.expenseTab === item ? " is-active" : "") + '" type="button" data-action="expense-tab" data-tab="' + esc(item) + '">' + esc(item === "Operativo" ? "Operativos" : item === "Administrativo" ? "Administrativos" : item) + '</button>';
     }).join("");
-    return pageHead("Gastos", "Centro de gastos operativos, administrativos y de personal.", '<button class="button button--primary" type="button" data-action="expense-create">Registrar gasto demo</button>') + '<section class="panel"><div class="tabs">' + tabs + '</div><div class="toolbar premium-toolbar"><button class="button button--quiet" type="button" data-action="filter-demo">Fecha</button><select><option>Categoría: todas</option></select><select><option>Centro de costo: todos</option></select><select><option>Ubicación: todas</option></select><select><option>Proveedor: todos</option></select><select><option>Responsable: todos</option></select><select><option>Estado: todos</option></select></div><div class="table-wrap"><table class="data-table expense-table"><thead><tr><th>Fecha</th><th>Categoría</th><th>Tipo</th><th>Centro de costo</th><th>Proveedor</th><th>Monto</th><th>Moneda</th><th>Responsable</th><th>Comprobante</th><th>Estado</th><th>Acción</th></tr></thead><tbody>' + expenseRows() + '</tbody></table></div></section>';
+    const actions = '<div class="page-action-group"><button class="button button--quiet" type="button" data-action="expense-excel" data-kind="importar">Importar Excel</button><button class="button button--quiet" type="button" data-action="expense-excel" data-kind="exportar">Exportar Excel</button><button class="button button--primary" type="button" data-action="expense-create">Registrar gasto demo</button></div>';
+    return pageHead("Gastos", "Centro de gastos operativos, administrativos y de personal.", actions) + '<section class="panel"><div class="tabs">' + tabs + '</div><div class="toolbar premium-toolbar"><button class="button button--quiet" type="button" data-action="filter-demo">Fecha</button><select aria-label="Categoría"><option>Categoría: todas</option></select><select aria-label="Centro de costo"><option>Centro de costo: todos</option></select><select aria-label="Ubicación"><option>Ubicación: todas</option></select><select aria-label="Proveedor"><option>Proveedor: todos</option></select><select aria-label="Responsable"><option>Responsable: todos</option></select><select aria-label="Estado"><option>Estado: todos</option></select></div><div class="table-wrap"><table class="data-table expense-table"><thead><tr><th>Fecha</th><th>Categoría</th><th>Tipo</th><th>Centro de costo</th><th>Proveedor</th><th>Monto</th><th>Moneda</th><th>Responsable</th><th>Comprobante</th><th>Estado</th><th>Acción</th></tr></thead><tbody>' + expenseRows() + '</tbody></table></div></section>';
+  }
+
+  function expenseBreakdown(item) {
+    if (item.entryMode !== "itemized") return '<div class="simple-expense-amount"><span>Monto</span><strong>' + esc(expenseDisplayAmount(item)) + '</strong><p>' + esc(item.description) + '</p></div>';
+    return '<div class="expense-detail-lines">' + item.lines.map(function detailLine(line) {
+      return '<div class="expense-detail-line"><div><strong>' + esc(line.description) + '</strong><span>Cantidad ' + esc(line.quantity) + ' · Unitario ' + esc(formatExpenseMoney(line.unitPrice, item.currency)) + '</span></div><b>' + esc(formatExpenseMoney(line.quantity * line.unitPrice, item.currency)) + '</b></div>';
+    }).join("") + '<div class="expense-detail-total"><span>Total</span><strong>' + esc(formatExpenseMoney(expenseTotal(item), item.currency)) + '</strong></div></div>';
+  }
+
+  function expenseRelationshipCard(item) {
+    const relationship = item.relationship || { type: "Ninguno" };
+    if (relationship.type === "Ninguno") return '<div class="empty-inline">Este gasto no tiene una relación operativa.</div>';
+    const route = relationship.type === "Shipment" ? "shipment" : relationship.type === "Empleado" ? "employee" : "";
+    return '<div class="relationship-card"><span>' + badge(relationship.type, "info") + '</span><div><strong>' + esc(relationship.resourceId) + '</strong><small>' + esc(relationship.label) + '</small></div>' + (route ? '<button class="button button--small button--quiet" type="button" data-route="' + route + '" data-id="' + esc(relationship.resourceId) + '">Ver ' + esc(relationship.type.toLowerCase()) + '</button>' : "") + '</div>';
   }
 
   function renderExpenseDetail(params) {
-    const expenseItem = premium.expenses.find(function findExpense(item) { return item.expenseId === (params.get("id") || "EXP-DEMO-001"); });
+    const expenseItem = findExpense(params.get("id") || "EXP-DEMO-001");
     if (!expenseItem) return pageHead("Gasto no encontrado", "No existe ese registro demo.", routeButton("Volver", "expenses"));
-    const fields = [["Categoría", expenseItem.category], ["Monto", expenseItem.amount + " · DEMO DATA"], ["Fecha", expenseItem.date], ["Centro de costo", expenseItem.costCenter], ["Proveedor", expenseItem.provider], ["Responsable", expenseItem.responsible], ["Método de pago", expenseItem.paymentMethod], ["Comprobante", expenseItem.receipt], ["Shipment relacionado", expenseItem.shipmentId || "No aplica"], ["Notas", expenseItem.notes]];
-    return pageHead(expenseItem.expenseId, "Detalle financiero de demostración.", badge(expenseItem.approvalStatus), "Gastos / Detalle") + '<section class="detail-layout"><div class="panel"><div class="panel-head"><div><h2>Resumen</h2><p>Todos los importes son simulados.</p></div><span class="demo-label">Demo Data</span></div><div class="panel-body"><div class="summary-grid">' + fields.map(function field(item) { return '<div class="summary-item"><small>' + esc(item[0]) + '</small><strong>' + esc(item[1]) + '</strong></div>'; }).join("") + '</div></div></div><aside class="panel"><div class="panel-head"><div><h2>Aprobación</h2><p>Historial demo, sin escritura persistente.</p></div></div><div class="panel-body"><ol class="timeline"><li><time>17 Sep</time><i></i><span><strong>Registro preparado</strong><span>' + esc(expenseItem.responsible) + '</span></span></li><li><time>Hoy</time><i></i><span><strong>' + esc(expenseItem.approvalStatus) + '</strong><span>Requiere revisión humana</span></span></li></ol><div class="form-actions"><button class="button button--quiet" type="button" data-action="receipt-demo">Ver comprobante</button><button class="button button--quiet" type="button" data-action="expense-edit">Editar demo</button><button class="button button--primary" type="button" data-action="expense-approve" data-id="' + esc(expenseItem.expenseId) + '">Aprobar demo</button></div></div></aside></section>';
+    const fields = [["Tipo", expenseItem.type], ["Categoría", expenseItem.category], ["Total", expenseDisplayAmount(expenseItem)], ["Moneda", expenseItem.currency], ["Fecha", expenseItem.date], ["Centro de costo", expenseItem.costCenter], ["Proveedor", expenseItem.provider], ["Responsable", expenseItem.responsible], ["Forma de pago", expenseItem.paymentMethod], ["Estado", expenseItem.approvalStatus]];
+    const receipt = expenseItem.receiptDocument ? '<div class="receipt-card"><span class="receipt-kind">' + esc(expenseItem.receiptDocument.kind) + '</span><div><strong>' + esc(expenseItem.receiptDocument.name) + '</strong><small>✓ Adjuntado — Demo' + (expenseItem.receiptDocument.number ? ' · ' + esc(expenseItem.receiptDocument.number) : "") + '</small></div><button class="button button--small button--quiet" type="button" data-action="receipt-demo" data-id="' + esc(expenseItem.expenseId) + '">Ver demo</button></div>' : '<div class="empty-inline">Sin comprobante demo adjunto.</div>';
+    const history = expenseItem.history.map(function historyItem(item) { return '<li><time>' + esc(item.date) + '</time><i></i><span><strong>' + esc(item.title) + '</strong><span>' + esc(item.detail) + '</span></span></li>'; }).join("");
+    const actions = '<div class="page-action-group"><button class="button button--quiet" type="button" data-action="expense-edit" data-id="' + esc(expenseItem.expenseId) + '">Editar</button><button class="button button--primary" type="button" data-action="expense-approve" data-id="' + esc(expenseItem.expenseId) + '"' + (expenseItem.approvalStatus === "Aprobado demo" ? " disabled" : "") + '>' + (expenseItem.approvalStatus === "Aprobado demo" ? "Aprobado demo" : "Aprobar demo") + '</button><button class="button button--quiet" type="button" data-action="expense-more">Más</button></div>';
+    return pageHead(expenseItem.category, expenseItem.date + " · " + expenseItem.provider, actions, "Gastos / " + expenseItem.expenseId) +
+      '<section class="expense-detail-hero"><div><span>' + badge(expenseItem.type, "info") + badge(expenseItem.approvalStatus) + '</span><strong>' + esc(expenseDisplayAmount(expenseItem)) + '</strong><small>' + esc(expenseItem.entryMode === "itemized" ? expenseItem.lines.length + " conceptos conciliados" : "Gasto simple") + '</small></div><span class="demo-label">Demo Data</span></section>' +
+      '<section class="expense-detail-layout"><div class="detail-main"><article class="panel"><div class="panel-head"><div><h2>Resumen</h2><p>Datos principales del registro.</p></div></div><div class="panel-body"><div class="summary-grid expense-summary-grid">' + fields.map(function field(item) { return '<div class="summary-item"><small>' + esc(item[0]) + '</small><strong>' + esc(item[1]) + '</strong></div>'; }).join("") + '</div></div></article><article class="panel"><div class="panel-head"><div><h2>' + (expenseItem.entryMode === "itemized" ? "Desglose" : "Monto") + '</h2><p>' + (expenseItem.entryMode === "itemized" ? "El total se deriva de los conceptos." : "Este registro no requiere conceptos separados.") + '</p></div></div><div class="panel-body">' + expenseBreakdown(expenseItem) + '</div></article><article class="panel"><div class="panel-head"><div><h2>Comprobantes</h2><p>Documento simulado; no existe almacenamiento real.</p></div></div><div class="panel-body">' + receipt + '</div></article></div><aside class="detail-side"><article class="panel"><div class="panel-head"><div><h2>Relación operativa</h2><p>Contexto para análisis de costos.</p></div></div><div class="panel-body">' + expenseRelationshipCard(expenseItem) + '</div></article><article class="panel"><div class="panel-head"><div><h2>Notas</h2></div></div><div class="panel-body"><p class="expense-notes">' + esc(expenseItem.notes || expenseItem.description || "Sin notas internas.") + '</p></div></article><article class="panel"><div class="panel-head"><div><h2>Historial</h2><p>Auditoría local de esta sesión.</p></div></div><div class="panel-body"><ol class="timeline expense-history">' + history + '</ol></div></article></aside></section>';
+  }
+
+  function expenseOptions(items, selected) {
+    return items.map(function option(item) { return '<option value="' + esc(item) + '"' + (item === selected ? " selected" : "") + '>' + esc(item) + '</option>'; }).join("");
+  }
+
+  function newExpenseDraft() {
+    return {
+      expenseId: "", entryMode: "simple", type: "Operativo", category: "Aeropuerto / Handling",
+      costCenter: "Aeropuerto", date: "16 Sep 2026", provider: "Proveedor Handling Demo",
+      currency: "PYG", paymentMethod: "Transferencia", responsible: "Supervisor Courier Demo",
+      approvalStatus: "Pendiente", amountValue: 450000, description: "Internet oficina — Septiembre.",
+      notes: "", lines: [], receiptDocument: null,
+      relationship: { type: "Ninguno", resourceId: "", label: "" }, history: [],
+    };
+  }
+
+  function relationshipResources(type) {
+    if (type === "Shipment") return [["NXS-MIA-ASU-260918-A", "Miami → Asunción"], ["NXS-MIA-ASU-260921-B", "Miami → Asunción · Demo"]];
+    if (type === "Empleado") return [["EMP-COURIER-001", "Operador Courier Demo"], ["EMP-CUSTOMS-001", "Operador Aduana Demo"]];
+    if (type === "Aeropuerto / Centro de costo") return [["Aeropuerto", "Centro de costo Aeropuerto"], ["Centro internacional", "Centro internacional — Demo"]];
+    if (type === "Warehouse") return [["WH-MIA-DEMO", "Warehouse Miami — Demo"]];
+    if (type === "Sucursal") return [["SUC-ASU-DEMO", "Sucursal Asunción — Demo"]];
+    if (type === "Delivery") return [["DEL-DEMO-018", "Ruta de delivery — Demo"]];
+    if (type === "Proveedor") return [["PROV-HANDLING-DEMO", "Proveedor Handling Demo"]];
+    return [];
+  }
+
+  function renderExpenseEditorLines(editor) {
+    if (!editor.lines.length) return '<div class="empty-inline expense-lines-empty">Agregá al menos un concepto para calcular el total.</div>';
+    return editor.lines.map(function editorLine(line, index) {
+      return '<div class="expense-line-editor" data-line-id="' + esc(line.id) + '"><label><span>Concepto</span><input data-line-field="description" data-line-index="' + index + '" value="' + esc(line.description) + '" placeholder="Ej. Handling"></label><label><span>Cantidad</span><input type="number" min="0.01" step="0.01" data-line-field="quantity" data-line-index="' + index + '" value="' + esc(line.quantity) + '"></label><label><span>Precio unitario</span><input type="number" min="0" step="1" data-line-field="unitPrice" data-line-index="' + index + '" value="' + esc(line.unitPrice) + '"></label><div class="line-subtotal"><span>Subtotal</span><strong data-line-subtotal="' + index + '">' + esc(formatExpenseMoney(line.quantity * line.unitPrice, editor.currency)) + '</strong></div><button class="line-remove" type="button" data-action="expense-remove-line" data-line-index="' + index + '" aria-label="Eliminar ' + esc(line.description || "concepto") + '">' + icon("x") + '<span>Eliminar</span></button></div>';
+    }).join("");
+  }
+
+  function renderExpenseDrawer() {
+    const editor = state.expenseEditor;
+    if (!editor) return;
+    const isEdit = Boolean(editor.expenseId);
+    const categories = ["Aeropuerto / Handling", "Transporte aeropuerto", "Warehouse", "Carga aérea", "Documentación operativa", "Courier Partner", "Delivery", "Packaging", "Shipment incident", "Alquiler", "Electricidad", "Internet", "Software", "Oficina", "Combustible", "Marketing", "Mantenimiento", "Viaje de gerencia", "Representación", "Salario", "Horas extra", "Bono", "Adelanto", "Reembolso", "Otros"];
+    const relationshipTypes = ["Ninguno", "Shipment", "Empleado", "Aeropuerto / Centro de costo", "Warehouse", "Sucursal", "Delivery", "Proveedor"];
+    const resources = relationshipResources(editor.relationship.type);
+    const resourceOptions = resources.map(function resourceOption(item) { return '<option value="' + esc(item[0]) + '"' + (item[0] === editor.relationship.resourceId ? " selected" : "") + '>' + esc(item[0] + " · " + item[1]) + '</option>'; }).join("");
+    const amountSection = editor.entryMode === "simple" ? '<section class="expense-form-section"><div class="expense-section-head"><div><h3>Monto</h3><p>Un único importe, sin desglose requerido.</p></div></div><label class="field field--wide"><span>Monto total</span><div class="money-input"><b>' + (editor.currency === "USD" ? "USD" : "₲") + '</b><input type="number" min="0" step="1" data-expense-field="amountValue" value="' + esc(editor.amountValue) + '" required></div></label><label class="field field--wide"><span>Descripción</span><input data-expense-field="description" value="' + esc(editor.description) + '" placeholder="Ej. Internet oficina — Septiembre"></label></section>' : '<section class="expense-form-section"><div class="expense-section-head"><div><h3>Desglose del gasto</h3><p>Conceptos controlados; el total se calcula automáticamente.</p></div><span class="demo-label">' + editor.lines.length + ' conceptos</span></div><div class="expense-line-head" aria-hidden="true"><span>Concepto</span><span>Cant.</span><span>Precio unitario</span><span>Subtotal</span><span>Acción</span></div><div class="expense-lines" id="expenseLines">' + renderExpenseEditorLines(editor) + '</div><button class="button button--quiet button--small add-expense-line" type="button" data-action="expense-add-line">+ Agregar concepto</button><div class="expense-editor-totals"><span><small>Subtotal</small><strong data-expense-subtotal>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong></span><span><small>Otros ajustes</small><strong>' + esc(formatExpenseMoney(0, editor.currency)) + '</strong></span><span class="is-total"><small>Total</small><strong data-expense-total>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong></span></div></section>';
+    const receipt = editor.receiptDocument ? '<div class="receipt-card receipt-card--editor"><span class="receipt-kind">' + esc(editor.receiptDocument.kind) + '</span><div><strong>' + esc(editor.receiptDocument.name) + '</strong><small>✓ Adjuntado — Demo</small></div><button class="button button--small button--quiet" type="button" data-action="expense-receipt-view">Ver demo</button><button class="button button--small button--quiet" type="button" data-action="expense-receipt-remove">Quitar</button></div><div class="expense-form-grid receipt-metadata"><label class="field"><span>Número de comprobante</span><input data-receipt-field="number" value="' + esc(editor.receiptDocument.number || "") + '"></label><label class="field"><span>Fecha de comprobante</span><input data-receipt-field="date" value="' + esc(editor.receiptDocument.date || editor.date) + '"></label></div>' : '<button class="receipt-drop" type="button" data-action="expense-receipt-attach">' + icon("file") + '<span><strong>+ Adjuntar comprobante</strong><small>Simulación local · PDF, JPG o PNG</small></span></button>';
+    modalLayer.classList.add("is-expense-drawer");
+    modalLayer.innerHTML = '<div class="modal-backdrop" data-action="cancel-expense-editor"></div><section class="modal expense-drawer" role="dialog" aria-modal="true" aria-labelledby="expenseEditorTitle"><form id="expenseEditorForm"><header class="expense-drawer-head"><div><span class="premium-kicker">' + (isEdit ? "Editar registro" : "Nuevo registro") + '</span><h2 id="expenseEditorTitle">' + (isEdit ? "Editar gasto" : "Registrar gasto") + '</h2><p>' + (isEdit ? esc(editor.expenseId) : "Crear un gasto operativo, administrativo o de personal.") + '</p></div><button class="modal-close" type="button" data-action="cancel-expense-editor" aria-label="Cerrar">' + icon("x") + '</button></header><div class="expense-drawer-body"><section class="expense-mode-picker"><span>Tipo de registro</span><div><button type="button" data-action="expense-entry-mode" data-mode="simple" class="' + (editor.entryMode === "simple" ? "is-active" : "") + '">Gasto simple</button><button type="button" data-action="expense-entry-mode" data-mode="itemized" class="' + (editor.entryMode === "itemized" ? "is-active" : "") + '">Gasto con desglose</button></div></section><section class="expense-form-section"><div class="expense-section-head"><div><h3>Información general</h3><p>Clasificación y responsable del gasto.</p></div></div><div class="expense-form-grid"><label class="field"><span>Tipo</span><select data-expense-field="type">' + expenseOptions(["Operativo", "Administrativo", "Personal"], editor.type) + '</select></label><label class="field"><span>Categoría</span><select data-expense-field="category">' + expenseOptions(categories, editor.category) + '</select></label><label class="field"><span>Centro de costo</span><select data-expense-field="costCenter">' + expenseOptions(premium.finance.costCenters, editor.costCenter) + '</select></label><label class="field"><span>Fecha</span><input data-expense-field="date" value="' + esc(editor.date) + '" required></label><label class="field field--wide"><span>Proveedor</span><input data-expense-field="provider" value="' + esc(editor.provider) + '" required></label><label class="field"><span>Moneda</span><select data-expense-field="currency">' + expenseOptions(["PYG", "USD"], editor.currency) + '</select></label><label class="field"><span>Forma de pago</span><select data-expense-field="paymentMethod">' + expenseOptions(["Transferencia", "Tarjeta", "Efectivo demo", "Crédito proveedor"], editor.paymentMethod) + '</select></label><label class="field"><span>Responsable</span><select data-expense-field="responsible">' + expenseOptions(["Supervisor Courier Demo", "Supervisor Aduana Demo", "Administración Demo", "RR. HH. Demo", "Gerencia Demo"], editor.responsible) + '</select></label><label class="field"><span>Estado</span><select data-expense-field="approvalStatus">' + expenseOptions(["Pendiente", "En revisión", "Aprobado demo", "Rechazado demo"], editor.approvalStatus) + '</select></label></div></section>' + amountSection + '<section class="expense-form-section"><div class="expense-section-head"><div><h3>Relación operativa</h3><p>Asociación opcional para reportes futuros.</p></div></div><div class="expense-form-grid"><label class="field"><span>Relacionado con</span><select data-relationship-field="type">' + expenseOptions(relationshipTypes, editor.relationship.type) + '</select></label>' + (editor.relationship.type !== "Ninguno" ? '<label class="field"><span>Recurso</span><select data-relationship-field="resourceId">' + resourceOptions + '</select></label>' : "") + '</div>' + (editor.relationship.type !== "Ninguno" && editor.relationship.resourceId ? '<div class="relationship-preview"><strong>' + esc(editor.relationship.resourceId) + '</strong><span>' + esc(editor.relationship.label) + '</span></div>' : "") + '</section><section class="expense-form-section"><div class="expense-section-head"><div><h3>Comprobante</h3><p>Adjunto simulado; no se carga ningún archivo a la red.</p></div></div>' + receipt + '</section><section class="expense-form-section"><div class="expense-section-head"><div><h3>Notas</h3></div></div><label class="field field--wide"><span>Notas internas</span><textarea data-expense-field="notes" placeholder="Notas internas sobre este gasto...">' + esc(editor.notes) + '</textarea></label></section></div><footer class="expense-drawer-footer"><button class="button button--quiet" type="button" data-action="cancel-expense-editor">Cancelar</button><div><span>Total calculado</span><strong data-expense-footer-total>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong></div><button class="button button--primary" type="submit">' + (isEdit ? "Revisar cambios" : "Registrar gasto demo") + '</button></footer></form></section>';
+    modalLayer.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function openExpenseEditor(item) {
+    state.expenseEditor = item ? cloneExpense(item) : newExpenseDraft();
+    state.expenseEditor._originalTotal = item ? expenseTotal(item) : 0;
+    renderExpenseDrawer();
+    const firstField = modalLayer.querySelector("[data-expense-field]");
+    if (firstField) firstField.focus();
+  }
+
+  function updateExpenseDrawerTotals() {
+    const editor = state.expenseEditor;
+    if (!editor) return;
+    syncExpenseAmount(editor);
+    editor.lines.forEach(function updateLine(line, index) {
+      const node = modalLayer.querySelector('[data-line-subtotal="' + index + '"]');
+      if (node) node.textContent = formatExpenseMoney(line.subtotal, editor.currency);
+    });
+    modalLayer.querySelectorAll("[data-expense-subtotal], [data-expense-total], [data-expense-footer-total]").forEach(function updateTotal(node) {
+      node.textContent = formatExpenseMoney(expenseTotal(editor), editor.currency);
+    });
+  }
+
+  function clearExpenseActionAndRender(page, id) {
+    const params = new URLSearchParams({ page: page, mode: "premium" });
+    if (id) params.set("id", id);
+    global.history.replaceState({}, "", "?" + params.toString());
+    closeModal();
+    renderCurrent();
+  }
+
+  function validateExpenseDraft(editor) {
+    if (!editor.provider.trim()) return "Ingresá un proveedor.";
+    if (editor.entryMode === "simple" && expenseTotal(editor) <= 0) return "Ingresá un monto mayor que cero.";
+    if (editor.entryMode === "itemized" && !editor.lines.length) return "Agregá al menos un concepto.";
+    if (editor.entryMode === "itemized" && editor.lines.some(function invalidLine(line) { return !line.description.trim() || Number(line.quantity) <= 0 || Number(line.unitPrice) < 0; })) return "Completá cada concepto con cantidad positiva y precio válido.";
+    return "";
+  }
+
+  function showExpenseSaveConfirmation() {
+    const editor = syncExpenseAmount(cloneExpense(state.expenseEditor));
+    const error = validateExpenseDraft(editor);
+    if (error) { showToast("Revisá el gasto", error); return; }
+    state.pendingExpense = editor;
+    const receiptCount = editor.receiptDocument ? 1 : 0;
+    if (!editor.expenseId) {
+      const body = '<div class="expense-confirm-card"><span>' + badge(editor.type, "info") + '</span><h3>' + esc(editor.category) + '</h3><strong>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong><ul><li>' + (editor.entryMode === "itemized" ? esc(editor.lines.length) + " conceptos" : "Gasto simple") + '</li><li>' + receiptCount + ' comprobante demo</li><li>Relacionado con: ' + esc(editor.relationship.resourceId || "Ninguno") + '</li></ul></div><div class="notice-box"><strong>Solo demostración</strong><span>No se enviarán datos al backend ni se almacenarán archivos.</span></div>';
+      showModal("Registrar gasto", "Revisá el resumen antes de confirmar.", body, '<button class="button button--quiet" type="button" data-action="return-expense-editor">Volver</button><button class="button button--primary" type="button" data-action="confirm-expense-register">Confirmar demo</button>');
+      return;
+    }
+    const changed = editor._originalTotal !== expenseTotal(editor);
+    if (changed) {
+      const difference = expenseTotal(editor) - editor._originalTotal;
+      const body = '<div class="amount-comparison"><div><small>Monto anterior</small><strong>' + esc(formatExpenseMoney(editor._originalTotal, editor.currency)) + '</strong></div><div><small>Monto nuevo</small><strong>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong></div><div class="' + (difference >= 0 ? "is-positive" : "is-negative") + '"><small>Diferencia</small><strong>' + (difference >= 0 ? "+" : "−") + esc(formatExpenseMoney(Math.abs(difference), editor.currency)) + '</strong></div></div><form id="expenseEditConfirmForm"><label class="field field--wide"><span>Motivo del cambio</span><textarea name="reason" required placeholder="Ej. Ajuste de comprobante"></textarea></label></form>';
+      showModal("Guardar cambio demo", "El total cambió y requiere justificación.", body, '<button class="button button--quiet" type="button" data-action="return-expense-editor">Cancelar</button><button class="button button--primary" type="submit" form="expenseEditConfirmForm">Guardar cambio demo</button>');
+    } else {
+      showModal("Guardar cambios", "Confirmá la actualización de este gasto demo.", '<div class="expense-confirm-card"><h3>' + esc(editor.expenseId) + '</h3><strong>' + esc(formatExpenseMoney(expenseTotal(editor), editor.currency)) + '</strong><p>Los cambios vivirán únicamente en esta sesión.</p></div>', '<button class="button button--quiet" type="button" data-action="return-expense-editor">Volver</button><button class="button button--primary" type="button" data-action="confirm-expense-edit">Guardar cambio demo</button>');
+    }
+  }
+
+  function commitExpenseRegistration() {
+    const item = state.pendingExpense;
+    item.expenseId = "EXP-DEMO-" + String(state.expenses.length + 1).padStart(3, "0");
+    item.receipt = item.receiptDocument ? "Adjunto demo" : "Sin adjunto";
+    item.history = [{ date: "18 Sep · 14:20", title: "Gasto creado", detail: "Admin Demo · Registro de demostración" }];
+    syncExpenseAmount(item);
+    state.expenses.unshift(item);
+    state.pendingExpense = null;
+    state.expenseEditor = null;
+    clearExpenseActionAndRender("expense", item.expenseId);
+    showToast("Gasto registrado para la demostración.", "No se realizaron cambios de backend.");
+  }
+
+  function commitExpenseEdit(reason) {
+    const item = state.pendingExpense;
+    const index = state.expenses.findIndex(function findIndex(expenseItem) { return expenseItem.expenseId === item.expenseId; });
+    if (index < 0) return;
+    const previous = state.expenses[index];
+    const oldTotal = expenseTotal(previous);
+    const newTotal = expenseTotal(item);
+    item.history = previous.history.slice();
+    item.history.push({ date: "18 Sep · 14:22", title: oldTotal === newTotal ? "Datos del gasto actualizados" : "Monto actualizado", detail: oldTotal === newTotal ? "Admin Demo · Edición confirmada" : "Anterior: " + formatExpenseMoney(oldTotal, item.currency) + " · Nuevo: " + formatExpenseMoney(newTotal, item.currency) + " · Admin Demo · Motivo: " + reason });
+    state.expenses[index] = syncExpenseAmount(item);
+    state.pendingExpense = null;
+    state.expenseEditor = null;
+    clearExpenseActionAndRender("expense", item.expenseId);
+    showToast("Gasto actualizado para la demostración.", "El evento fue agregado al historial local.");
   }
 
   function renderReception() {
@@ -423,6 +631,9 @@
     if (/pendiente.*aprobacion|gastos pendientes/.test(query)) return '<div class="ai-result"><h3>4 gastos requieren aprobación o revisión</h3><p>EXP-DEMO-001, EXP-DEMO-005, EXP-DEMO-010 y EXP-DEMO-011.</p><div class="evidence-box"><strong>Evidencia</strong><span>Estado: Pendiente</span><span>Datos demo · Sep 2026</span></div><button class="button button--quiet" type="button" data-route="expenses">Ver pendientes</button></div>';
     if (/analiza.*gasto|gastos.*septiembre/.test(query)) return '<div class="ai-result"><h3>Análisis de gastos · Septiembre</h3><p>Operación concentra el mayor volumen demo; aeropuerto y carga aérea son los principales impulsores. Administración permanece estable y personal está protegido.</p><div class="evidence-box"><strong>Evidencia</strong><span>12 gastos demo</span><span>6 centros de costo</span><span>PYG + USD, sin conversión contable real</span></div><button class="button button--quiet" type="button" data-route="finance">Ver finanzas</button></div>';
     if (/compara|agosto.*septiembre/.test(query)) return '<div class="ai-result"><h3>Septiembre sube 8,4% demo vs. agosto</h3><p>La variación se concentra en aeropuerto, software y horas extra.</p><div class="evidence-box"><strong>Evidencia</strong><span>Comparativo mensual simulado</span><span>Sin contabilidad real</span></div><button class="button button--quiet" type="button" data-route="reports">Ver comparativo</button></div>';
+    if (/exp-demo-001|que contiene.*001|qué contiene.*001/.test(query)) {
+      return '<div class="ai-result"><span class="premium-kicker">EXP-DEMO-001</span><h3>Aeropuerto / Handling</h3><p>Total: <strong>₲ 18.400.000</strong></p><div class="breakdown-list"><span><b>Handling</b><strong>₲ 8.500.000</strong></span><span><b>Carga / descarga</b><strong>₲ 3.200.000</strong></span><span><b>Almacenaje</b><strong>₲ 2.700.000</strong></span><span><b>Documentación</b><strong>₲ 1.500.000</strong></span><span><b>Transporte interno</b><strong>₲ 2.500.000</strong></span></div><div class="evidence-box"><strong>Evidencia</strong><span>Expense record</span><span>5 expense lines</span><span>Receipt demo</span></div><button class="button button--quiet" type="button" data-route="expense" data-id="EXP-DEMO-001">Ver gasto</button></div>';
+    }
     if (/aeropuerto/.test(query)) {
       return '<div class="ai-result"><span class="premium-kicker">Gastos aeropuerto · Septiembre</span><h3>DEMO ₲ 35.450.000</h3><div class="breakdown-list"><span><b>Handling</b><strong>42%</strong></span><span><b>Transporte</b><strong>21%</strong></span><span><b>Documentación</b><strong>18%</strong></span><span><b>Otros</b><strong>19%</strong></span></div><div class="evidence-box"><strong>Evidencia</strong><span>Cost Center: Aeropuerto</span><span>Período: Sep 2026</span><span>12 demo expense records</span></div><div class="card-actions"><button class="button button--quiet" type="button" data-route="expenses">Ver movimientos</button><button class="button button--primary" type="button" data-action="prepare-excel" data-file="NexCourier_Aeropuerto_Septiembre.xlsx">Preparar Excel</button></div></div>';
     }
@@ -528,12 +739,25 @@
     renderAiQuick(route);
     view.focus({ preventScroll: true });
     global.scrollTo(0, 0);
+    if (isPremium() && route.params.get("action") === "new" && route.page === "expenses") openExpenseEditor();
+    if (isPremium() && route.params.get("action") === "edit" && route.page === "expense") {
+      const expenseItem = findExpense(route.params.get("id") || "EXP-DEMO-001");
+      if (expenseItem) openExpenseEditor(expenseItem);
+    }
   }
 
   function navigate(page, id) {
     global.history.pushState({}, "", routeHref(page, id));
     closeTransient();
     document.body.classList.remove("sidebar-open");
+    renderCurrent();
+  }
+
+  function navigateExpenseAction(action, id) {
+    const params = new URLSearchParams({ page: id ? "expense" : "expenses", mode: "premium", action: action });
+    if (id) params.set("id", id);
+    global.history.pushState({}, "", "?" + params.toString());
+    closeTransient();
     renderCurrent();
   }
 
@@ -553,6 +777,7 @@
   }
 
   function showModal(title, subtitle, body, actions) {
+    modalLayer.classList.remove("is-expense-drawer");
     modalLayer.innerHTML = '<div class="modal-backdrop" data-action="close-modal"></div><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" type="button" data-action="close-modal" aria-label="Cerrar">' + icon("x") + '</button><div class="modal-head"><h2 id="modalTitle">' + esc(title) + '</h2><p>' + esc(subtitle) + '</p></div><div class="modal-body">' + body + '</div><div class="modal-actions">' + actions + "</div></section>";
     modalLayer.hidden = false;
     document.body.classList.add("modal-open");
@@ -563,6 +788,7 @@
   function closeModal() {
     modalLayer.hidden = true;
     modalLayer.innerHTML = "";
+    modalLayer.classList.remove("is-expense-drawer");
     document.body.classList.remove("modal-open");
   }
 
@@ -637,8 +863,54 @@
     if (rows) rows.innerHTML = customerRows(matches);
   }
 
+  function updateExpenseEditorFromControl(control) {
+    const editor = state.expenseEditor;
+    if (!editor) return false;
+    if (control.dataset.expenseField) {
+      const field = control.dataset.expenseField;
+      editor[field] = field === "amountValue" ? Math.max(0, Number(control.value) || 0) : control.value;
+      updateExpenseDrawerTotals();
+      return true;
+    }
+    if (control.dataset.lineField) {
+      const line = editor.lines[Number(control.dataset.lineIndex)];
+      if (!line) return true;
+      const field = control.dataset.lineField;
+      line[field] = field === "description" ? control.value : Math.max(0, Number(control.value) || 0);
+      updateExpenseDrawerTotals();
+      return true;
+    }
+    if (control.dataset.relationshipField) {
+      const field = control.dataset.relationshipField;
+      editor.relationship[field] = control.value;
+      if (field === "type") {
+        const first = relationshipResources(control.value)[0] || ["", ""];
+        editor.relationship.resourceId = first[0];
+        editor.relationship.label = first[1];
+      } else {
+        const resource = relationshipResources(editor.relationship.type).find(function findResource(item) { return item[0] === control.value; });
+        editor.relationship.label = resource ? resource[1] : "";
+      }
+      renderExpenseDrawer();
+      return true;
+    }
+    if (control.dataset.receiptField && editor.receiptDocument) {
+      editor.receiptDocument[control.dataset.receiptField] = control.value;
+      return true;
+    }
+    return false;
+  }
+
   function handleSubmit(event) {
-    if (event.target.id === "lookupForm") {
+    if (event.target.id === "expenseEditorForm") {
+      event.preventDefault();
+      showExpenseSaveConfirmation();
+    } else if (event.target.id === "expenseEditConfirmForm") {
+      event.preventDefault();
+      const reason = new FormData(event.target).get("reason").trim();
+      if (!reason) { showToast("Motivo requerido", "Indicá por qué cambió el monto."); return; }
+      commitExpenseEdit(reason);
+    } else if (event.target.id === "lookupForm") {
       event.preventDefault();
       const tracking = new FormData(event.target).get("tracking").trim();
       state.receptionConfirmed = false;
@@ -692,6 +964,47 @@
     } else if (action === "expense-tab") {
       state.expenseTab = element.dataset.tab;
       renderCurrent();
+    } else if (action === "expense-create") {
+      navigateExpenseAction("new");
+    } else if (action === "expense-edit") {
+      navigateExpenseAction("edit", element.dataset.id || currentRoute().params.get("id") || "EXP-DEMO-001");
+    } else if (action === "cancel-expense-editor") {
+      state.expenseEditor = null;
+      state.pendingExpense = null;
+      clearExpenseActionAndRender(currentRoute().page, currentRoute().params.get("id"));
+    } else if (action === "return-expense-editor") {
+      renderExpenseDrawer();
+    } else if (action === "expense-entry-mode") {
+      state.expenseEditor.entryMode = element.dataset.mode;
+      if (state.expenseEditor.entryMode === "itemized" && !state.expenseEditor.lines.length) state.expenseEditor.lines.push({ id: "LINE-" + Date.now(), description: "", quantity: 1, unitPrice: 0, subtotal: 0 });
+      renderExpenseDrawer();
+    } else if (action === "expense-add-line") {
+      state.expenseEditor.lines.push({ id: "LINE-" + Date.now(), description: "", quantity: 1, unitPrice: 0, subtotal: 0 });
+      renderExpenseDrawer();
+      const concepts = modalLayer.querySelectorAll('[data-line-field="description"]');
+      if (concepts.length) concepts[concepts.length - 1].focus();
+    } else if (action === "expense-remove-line") {
+      state.expenseEditor.lines.splice(Number(element.dataset.lineIndex), 1);
+      renderExpenseDrawer();
+    } else if (action === "expense-receipt-attach") {
+      state.expenseEditor.receiptDocument = { name: "factura-aeropuerto-sep.pdf", kind: "PDF", number: "FAC-DEMO-2409", date: state.expenseEditor.date };
+      renderExpenseDrawer();
+      showToast("Comprobante adjuntado — Demo", "No se cargó ningún archivo a la red.");
+    } else if (action === "expense-receipt-remove") {
+      state.expenseEditor.receiptDocument = null;
+      renderExpenseDrawer();
+    } else if (action === "expense-receipt-view" || action === "receipt-demo") {
+      const source = state.expenseEditor && state.expenseEditor.receiptDocument ? state.expenseEditor : findExpense(element.dataset.id || currentRoute().params.get("id"));
+      const file = source && source.receiptDocument;
+      showModal("Comprobante demo", file ? file.name : "Sin comprobante", file ? '<div class="receipt-preview-demo"><span class="receipt-kind">' + esc(file.kind) + '</span><strong>' + esc(file.name) + '</strong><p>Vista simulada. El archivo no existe en almacenamiento real.</p></div>' : '<div class="empty-inline">No hay un documento demo adjunto.</div>', '<button class="button button--primary" type="button" data-action="' + (state.expenseEditor ? "return-expense-editor" : "close-modal") + '">Cerrar</button>');
+    } else if (action === "confirm-expense-register") {
+      commitExpenseRegistration();
+    } else if (action === "confirm-expense-edit") {
+      commitExpenseEdit("Edición de datos generales");
+    } else if (action === "expense-excel") {
+      showToast((element.dataset.kind === "importar" ? "Importar" : "Exportar") + " Excel", "Disponible en la siguiente fase; no se procesó ningún archivo.");
+    } else if (action === "expense-more") {
+      showToast("Más acciones", "Duplicar y anular estarán disponibles en una fase posterior.");
     } else if (action === "prepare-excel") {
       const file = element.dataset.file || "NexCourier_Gastos_Septiembre.xlsx";
       const body = '<div class="report-progress"><p>✓ Recopilando gastos</p><p>✓ Agrupando categorías</p><p>✓ Calculando subtotales</p><p>✓ Preparando gráficos</p><p>✓ Generando estructura</p></div>' + workbookResult(file, file.indexOf("Asistencia") >= 0 ? ["Resumen", "Courier", "Aduana", "Horas extra", "Tardanzas", "Ausencias"] : ["Resumen", "Aeropuerto", "Administración", "Personal", "Proveedores", "Gráficos"], "Datos determinísticos de esta demostración");
@@ -702,7 +1015,18 @@
       closeModal();
       showToast("Descarga simulada", "No se generó ni descargó un XLSX real.");
     } else if (action === "expense-approve") {
-      showModal("Confirmar aprobación demo", "Esta acción financiera requiere confirmación humana.", '<div class="confirm-summary"><div><small>Registro</small><strong>' + esc(element.dataset.id) + '</strong></div><div><small>Alcance</small><strong>Sesión local</strong></div></div><div class="notice-box notice-box--warning"><strong>Acción sensible</strong><span>No se modificará información financiera real.</span></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--primary" type="button" data-action="confirm-sensitive-demo">Confirmar demo</button>');
+      const expenseItem = findExpense(element.dataset.id);
+      if (!expenseItem) return;
+      const receiptLabel = expenseItem.receiptDocument ? "Adjunto demo" : "Sin comprobante";
+      showModal("Aprobar gasto", "La aprobación requiere confirmación humana explícita.", '<div class="confirm-summary"><div><small>Registro</small><strong>' + esc(expenseItem.expenseId) + '</strong></div><div><small>Monto</small><strong>' + esc(formatExpenseMoney(expenseTotal(expenseItem), expenseItem.currency)) + '</strong></div><div><small>Proveedor</small><strong>' + esc(expenseItem.provider) + '</strong></div><div><small>Comprobante</small><strong>' + esc(receiptLabel) + '</strong></div></div><div class="notice-box notice-box--warning"><strong>Acción sensible</strong><span>El resultado solo vive en esta sesión de demostración.</span></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--primary" type="button" data-action="confirm-expense-approval" data-id="' + esc(expenseItem.expenseId) + '">Aprobar demo</button>');
+    } else if (action === "confirm-expense-approval") {
+      const expenseItem = findExpense(element.dataset.id);
+      if (!expenseItem) return;
+      expenseItem.approvalStatus = "Aprobado demo";
+      expenseItem.history.push({ date: "18 Sep · 14:26", title: "Gasto aprobado demo", detail: "Admin Demo · Confirmación humana" });
+      closeModal();
+      renderCurrent();
+      showToast("Gasto aprobado para demostración.", "El evento fue agregado a la auditoría local.");
     } else if (action === "review-correction" || action === "prepare-correction") {
       const correction = premium.correction;
       showModal("Solicitud de corrección", "Requiere aprobación de un responsable.", '<div class="confirm-summary"><div><small>Empleado</small><strong>' + esc(correction.employee) + '</strong></div><div><small>Actual</small><strong>' + esc(correction.current) + '</strong></div><div><small>Solicitado</small><strong>' + esc(correction.requested) + '</strong></div><div><small>Motivo</small><strong>' + esc(correction.reason) + '</strong></div></div><div class="notice-box notice-box--warning"><strong>No aplicado</strong><span>La corrección permanece pendiente hasta la confirmación.</span></div>', '<button class="button button--danger" type="button" data-action="reject-correction">Rechazar demo</button><button class="button button--primary" type="button" data-action="approve-correction">Aprobar demo</button>');
@@ -755,7 +1079,7 @@
     else if (action === "review-match") showModal("Revisar coincidencia", "La asignación requiere confirmación humana.", '<div class="confirm-summary"><div><small>Caso</small><strong>' + esc(element.dataset.case) + '</strong></div><div><small>Posible cliente</small><strong>NXC-10482</strong></div><div><small>Evidencia</small><strong>Código parcial · nombre similar</strong></div></div><div class="notice-box notice-box--warning"><strong>No asignado</strong><span>La demostración conserva el paquete en la cola hasta confirmar.</span></div>', '<button class="button button--quiet" type="button" data-action="close-modal">Cancelar</button><button class="button button--navy" type="button" data-action="confirm-match-demo">Confirmar demo</button>');
     else if (action === "confirm-match-demo") { closeModal(); showToast("Coincidencia revisada", "Confirmación simulada; la fuente canónica no fue modificada."); }
     else if (action === "demo-soon") showToast(element.dataset.label || "Función demo", "Próximamente en el sistema conectado.");
-    else if (["assign-shipment", "customer-search-demo", "create-case", "support-note", "delivery-demo", "warehouse-lookup", "support-demo", "payment-demo", "billing-demo", "team-demo", "audit-filter", "settings-demo", "expense-create", "expense-edit", "receipt-demo", "employee-tab", "overtime-review", "overtime-approve", "overtime-reject", "personnel-payment-review"].includes(action)) showToast("Acción de demostración", "Interacción preparada como shell; no realiza cambios externos.");
+    else if (["assign-shipment", "customer-search-demo", "create-case", "support-note", "delivery-demo", "warehouse-lookup", "support-demo", "payment-demo", "billing-demo", "team-demo", "audit-filter", "settings-demo", "employee-tab", "overtime-review", "overtime-approve", "overtime-reject", "personnel-payment-review"].includes(action)) showToast("Acción de demostración", "Interacción preparada como shell; no realiza cambios externos.");
   }
 
   document.addEventListener("click", function clickHandler(event) {
@@ -773,11 +1097,13 @@
 
   document.addEventListener("submit", handleSubmit);
   document.addEventListener("input", function inputHandler(event) {
+    if (updateExpenseEditorFromControl(event.target)) return;
     if (event.target === globalSearch) displaySearchResults();
     else if (event.target.id === "packageSearch") filterPackageTable();
     else if (event.target.id === "customerSearch") filterCustomerTable();
   });
   document.addEventListener("change", function changeHandler(event) {
+    if (updateExpenseEditorFromControl(event.target)) return;
     if (event.target.id === "statusFilter") filterPackageTable();
   });
   document.addEventListener("keydown", function keyboardHandler(event) {
@@ -791,7 +1117,12 @@
       document.body.classList.remove("sidebar-open");
     }
   });
-  global.addEventListener("popstate", renderCurrent);
+  global.addEventListener("popstate", function handlePopState() {
+    if (!modalLayer.hidden) closeModal();
+    state.expenseEditor = null;
+    state.pendingExpense = null;
+    renderCurrent();
+  });
 
   displayNotifications();
   renderCurrent();
