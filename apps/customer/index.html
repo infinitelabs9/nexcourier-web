@@ -4,74 +4,91 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#071a34">
   <title>Mi NexCourier — Demo</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../shared/styles/demo-shell.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="customer.css?v=customer-portal-01">
 </head>
 <body>
-  <header class="demo-nav">
-    <div class="demo-nav__inner">
-      <a class="brand" href="../website/" aria-label="NexCourier — Sitio público">
-        <img src="../../shared/assets/nexcourier-logo-transparent.png" alt="">
-        <span><strong>NexCourier</strong><small>Navegación local de demo</small></span>
-      </a>
-      <nav class="demo-links" aria-label="Experiencias de demostración">
-        <a href="../website/">Sitio público</a>
-        <a href="./" aria-current="page">Mi NexCourier</a>
-        <a href="../admin/">Admin</a>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3V11Z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.7 20h18.6L12 3Z"/><path d="M12 9v5M12 17.2v.1"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v6l4 2"/></symbol>
+    <symbol id="i-locker" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18M14 8h2M14 13h2"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h1M12 11h1M16 11h1M8 15h1M12 15h1M16 15h1"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 5h11v12H3V5ZM14 9h4l3 4v4h-7V9Z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 1 1 3.2 2.3c-.8.3-1 1-1 1.7M12 17h.01"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></symbol>
+  </svg>
+
+  <div class="portal-layout">
+    <button class="mobile-scrim" type="button" data-action="close-sidebar" aria-label="Cerrar navegación"></button>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <a class="brand" href="?page=dashboard" data-route="dashboard" aria-label="Mi NexCourier — Inicio">
+          <img src="../../shared/assets/nexcourier-logo-transparent.png" alt="">
+          <span><strong>NexCourier</strong><small>Mi cuenta</small></span>
+        </a>
+        <button class="sidebar-close" type="button" data-action="close-sidebar" aria-label="Cerrar navegación"><svg><use href="#i-x"/></svg></button>
+      </div>
+      <nav class="side-nav" aria-label="Navegación de Mi NexCourier">
+        <div class="nav-section"><p>General</p><a href="?page=dashboard" data-route="dashboard"><svg><use href="#i-home"/></svg><span>Inicio</span></a></div>
+        <div class="nav-section"><p>Mis envíos</p><a href="?page=packages" data-route="packages"><svg><use href="#i-box"/></svg><span>Mis paquetes</span></a><a href="?page=actions" data-route="actions"><svg><use href="#i-alert"/></svg><span>Requieren atención</span><b>1</b></a><a href="?page=history" data-route="history"><svg><use href="#i-history"/></svg><span>Historial</span></a></div>
+        <div class="nav-section"><p>Mi casillero</p><a href="?page=locker" data-route="locker"><svg><use href="#i-locker"/></svg><span>Mi casillero</span></a><a href="?page=calculator" data-route="calculator"><svg><use href="#i-calc"/></svg><span>Calculadora</span></a></div>
+        <div class="nav-section"><p>Pagos</p><a href="?page=payments" data-route="payments"><svg><use href="#i-card"/></svg><span>Pagos</span></a><a href="?page=invoices" data-route="invoices"><svg><use href="#i-file"/></svg><span>Facturas</span></a></div>
+        <div class="nav-section"><p>Entrega</p><a href="?page=delivery" data-route="delivery"><svg><use href="#i-truck"/></svg><span>Retiro / Delivery</span></a></div>
+        <div class="nav-section"><p>Cuenta</p><a href="?page=notifications" data-route="notifications"><svg><use href="#i-bell"/></svg><span>Notificaciones</span></a><a href="?page=support" data-route="support"><svg><use href="#i-help"/></svg><span>Soporte</span></a><a href="?page=profile" data-route="profile"><svg><use href="#i-user"/></svg><span>Perfil</span></a></div>
       </nav>
-    </div>
-  </header>
+      <div class="sidebar-customer"><span>Cliente Demo</span><strong>NXC-10482</strong><small>Sesión demostrativa</small></div>
+    </aside>
 
-  <main data-demo-root>
-    <section class="hero-shell">
-      <div class="shell">
-        <p class="demo-kicker"><span data-demo="demoLabel">Cargando datos…</span></p>
-        <h1>Mi NexCourier — Demo</h1>
-        <p class="hero-shell__copy">Shell inicial del portal privado. Verifica que la identidad del cliente y sus paquetes provienen del contrato compartido.</p>
-        <p class="demo-warning">Sin backend real · Los datos no se guardan ni se envían.</p>
-      </div>
+    <main class="portal-main">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" type="button" data-action="open-sidebar" aria-label="Abrir navegación"><svg><use href="#i-menu"/></svg></button>
+        <div class="global-search">
+          <svg><use href="#i-search"/></svg>
+          <label class="sr-only" for="globalSearch">Buscar paquete o tracking</label>
+          <input id="globalSearch" type="search" autocomplete="off" placeholder="Buscar paquete o tracking..." aria-expanded="false" aria-controls="searchResults">
+          <div class="search-results" id="searchResults" hidden></div>
+        </div>
+        <div class="topbar-actions">
+          <div class="notification-wrap">
+            <button class="icon-button notification-button" type="button" data-action="toggle-notifications" aria-label="Ver notificaciones" aria-expanded="false"><svg><use href="#i-bell"/></svg><span>2</span></button>
+            <div class="notification-panel" id="notificationPanel" hidden></div>
+          </div>
+          <button class="profile-button" type="button" data-route="profile" aria-label="Abrir perfil"><span>CD</span><span><strong>Cliente Demo</strong><small>NXC-10482</small></span><svg><use href="#i-chevron"/></svg></button>
+        </div>
+      </header>
+      <div class="view" id="appView" tabindex="-1"></div>
+    </main>
+  </div>
+
+  <div class="modal-layer" id="modalLayer" hidden>
+    <button class="modal-backdrop" type="button" data-action="close-modal" aria-label="Cerrar diálogo"></button>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" data-action="close-modal" aria-label="Cerrar diálogo"><svg><use href="#i-x"/></svg></button>
+      <header class="modal-head"><h2 id="modalTitle"></h2><p id="modalSubtitle"></p></header>
+      <div class="modal-body" id="modalBody"></div>
+      <footer class="modal-actions" id="modalActions"></footer>
     </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><div><strong id="toastTitle"></strong><span id="toastMessage"></span></div><button type="button" data-action="close-toast" aria-label="Cerrar aviso">×</button></div>
 
-    <section class="content shell" aria-label="Prueba del contrato compartido">
-      <div class="proof-grid">
-        <article class="proof-card">
-          <h2>Cliente</h2>
-          <dl class="data-list">
-            <dt>Nombre</dt><dd data-demo="customerName">—</dd>
-            <dt>Código de cliente</dt><dd data-demo="customerId">—</dd>
-            <dt>Casillero</dt><dd data-demo="lockerCode">—</dd>
-            <dt>Recepción</dt><dd data-demo="lockerLocation">—</dd>
-          </dl>
-        </article>
-
-        <article class="proof-card">
-          <h2>Paquete reciente</h2>
-          <dl class="data-list">
-            <dt>Paquete</dt><dd data-demo="packageId">—</dd>
-            <dt>Tienda</dt><dd data-demo="packageMerchant">—</dd>
-            <dt>Estado</dt><dd><span class="status" data-demo="packageStatus">—</span></dd>
-            <dt>Ubicación</dt><dd data-demo="packageLocation">—</dd>
-          </dl>
-        </article>
-
-        <article class="proof-card proof-card--wide">
-          <h2>Requiere tu atención</h2>
-          <dl class="data-list">
-            <dt>Paquete</dt><dd data-demo="actionPackageId">—</dd>
-            <dt>Estado</dt><dd><span class="status status--attention" data-demo="actionPackageStatus">—</span></dd>
-            <dt>Mensaje</dt><dd data-demo="actionPackageMessage">—</dd>
-          </dl>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <footer class="demo-foot"><div class="shell">Mi NexCourier · Foundation shell · No es una interfaz final</div></footer>
   <script src="../../shared/data/demo-data.js"></script>
-  <script src="../../shared/js/demo-shell.js"></script>
+  <script src="data/customer-demo-data.js"></script>
+  <script src="customer.js?v=customer-portal-01"></script>
 </body>
 </html>
